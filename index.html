@@ -410,6 +410,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       <div class="form-group"><label class="form-label">거리 (km)</label><input class="form-input" id="inputKm" type="number" placeholder="0.0" step="0.1" min="0"></div>
     </div>
     <div class="form-group"><label class="form-label">메모 (선택)</label><input class="form-input" id="inputMemo" type="text" placeholder="오늘 러닝 한마디!"></div>
+    <div class="form-group"><label class="form-label">삭제 PIN (숫자 4자리)</label><input class="form-input" id="inputPin" type="number" placeholder="나중에 삭제할 때 필요해요" maxlength="4" style="-moz-appearance:textfield"></div>
     <div class="form-group">
       <label class="form-label">인증 사진</label>
       <div class="photo-upload-area" id="photoArea">
@@ -430,6 +431,17 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
     <div class="admin-login-desc">관리자 비밀번호를 입력하세요.</div>
     <div class="form-group"><label class="form-label">비밀번호</label><input class="form-input" id="adminPwInput" type="password" placeholder="비밀번호 입력"></div>
     <button class="btn-submit" id="adminLoginBtn">확인</button>
+  </div>
+</div>
+
+<!-- MODAL: PIN 삭제 확인 -->
+<div class="modal-bg" id="pinModalBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🗑 기록 삭제</div>
+    <div class="admin-login-desc" id="pinModalDesc">등록 시 설정한 PIN을 입력하세요.</div>
+    <div class="form-group"><label class="form-label">PIN (4자리)</label><input class="form-input" id="pinInput" type="number" placeholder="PIN 입력" style="-moz-appearance:textfield"></div>
+    <button class="btn-submit" id="pinConfirmBtn">삭제 확인</button>
   </div>
 </div>
 
@@ -821,10 +833,55 @@ window.calMove = function(dir){
 // ══════════════════════════════════
 //  ACTIONS
 // ══════════════════════════════════
+let pendingDeleteId = null;
+
+// 피드에서 삭제 — PIN 모달 오픈
 async function deleteLog(id){
-  if(!confirm('이 기록을 삭제할까요?'))return;
-  await removeLog(id);
+  if(adminUnlocked){
+    // 관리자는 PIN 없이 바로 삭제
+    if(!confirm('이 기록을 삭제할까요?'))return;
+    await removeLog(id);
+    return;
+  }
+  pendingDeleteId=id;
+  const log=logs.find(l=>l.id===id);
+  document.getElementById('pinModalDesc').textContent=
+    log?`'${log.name}'의 기록을 삭제하려면 등록 시 설정한 PIN을 입력하세요.`:'등록 시 설정한 PIN을 입력하세요.';
+  document.getElementById('pinInput').value='';
+  document.getElementById('pinModalBg').classList.add('open');
+  setTimeout(()=>document.getElementById('pinInput').focus(),400);
 }
+
+// PIN 확인 버튼
+document.getElementById('pinConfirmBtn').addEventListener('click',async()=>{
+  if(!pendingDeleteId)return;
+  const entered=String(document.getElementById('pinInput').value).trim();
+  const log=logs.find(l=>l.id===pendingDeleteId);
+  if(!log){showToast('기록을 찾을 수 없습니다');return}
+  if(!log.pin){
+    // PIN 없이 등록된 구 기록 — 그냥 삭제 허용
+    document.getElementById('pinModalBg').classList.remove('open');
+    await removeLog(pendingDeleteId);
+    pendingDeleteId=null;
+    return;
+  }
+  if(entered!==String(log.pin)){
+    showToast('❌ PIN이 맞지 않습니다');
+    document.getElementById('pinInput').value='';
+    return;
+  }
+  document.getElementById('pinModalBg').classList.remove('open');
+  await removeLog(pendingDeleteId);
+  pendingDeleteId=null;
+  showToast('🗑 기록이 삭제됐습니다');
+});
+document.getElementById('pinInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pinConfirmBtn').click()});
+document.getElementById('pinModalBg').addEventListener('click',e=>{
+  if(e.target===document.getElementById('pinModalBg')){
+    document.getElementById('pinModalBg').classList.remove('open');
+    pendingDeleteId=null;
+  }
+});
 async function deleteMember(name){
   if(!confirm(`'${name}' 회원을 삭제할까요?`))return;
   await removeMember(name);
@@ -904,15 +961,18 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
   const date=document.getElementById('inputDate').value;
   const km=parseFloat(document.getElementById('inputKm').value);
   const memo=document.getElementById('inputMemo').value.trim();
+  const pin=String(document.getElementById('inputPin').value).trim();
   if(!name){showToast('회원을 선택해 주세요');return}
   if(!date){showToast('날짜를 선택해 주세요');return}
   if(!km||km<=0){showToast('거리를 입력해 주세요');return}
+  if(!pin||pin.length!==4||isNaN(Number(pin))){showToast('PIN 4자리를 입력해 주세요');return}
   const btn=document.getElementById('btnSubmit');
   btn.disabled=true;btn.textContent='저장 중...';
   try{
-    const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,memo,photo:photoDataUrl||null,createdAt:Date.now()};
+    const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,memo,photo:photoDataUrl||null,pin,createdAt:Date.now()};
     await saveLog(log);
     feedMonth=getMonthKey(date);clearPhoto();closeRegModal();
+    document.getElementById('inputPin').value='';
     showToast(`✅ ${name} · ${km}km 인증 완료!`);
   }finally{
     btn.disabled=false;btn.textContent='인증 등록';
