@@ -30,6 +30,35 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 .logo-sub{font-size:9px;color:var(--muted);letter-spacing:2.5px;font-weight:300}
 .admin-btn{background:none;border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--muted);font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s;font-family:'Noto Sans KR',sans-serif}
 .admin-btn:hover{border-color:var(--border);color:var(--text)}
+.header-right{display:flex;align-items:center;gap:8px}
+.help-btn{width:30px;height:30px;border-radius:50%;background:none;border:1.5px solid var(--border2);color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .22s;flex-shrink:0;font-family:'Noto Sans KR',sans-serif}
+.help-btn:hover{border-color:var(--lime);color:var(--lime);box-shadow:0 0 10px var(--lime-glow)}
+
+/* ══ MANUAL MODAL ══ */
+.manual-modal-bg{position:fixed;inset:0;background:rgba(5,13,22,.92);backdrop-filter:blur(8px);z-index:400;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.manual-modal-bg.open{opacity:1;pointer-events:all}
+.manual-modal{background:var(--card2);border:1px solid var(--border);border-radius:22px 22px 0 0;padding:24px 22px 0;width:100%;max-width:480px;transform:translateY(40px);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
+.manual-modal-bg.open .manual-modal{transform:translateY(0)}
+.manual-close-btn{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px;transition:color .2s}
+.manual-close-btn:hover{color:var(--text)}
+.manual-section{margin-bottom:22px}
+.manual-section-title{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2px;color:var(--lime);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.manual-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.manual-item-num{width:20px;height:20px;border-radius:50%;background:rgba(200,240,0,.15);border:1px solid rgba(200,240,0,.3);color:var(--lime);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.manual-item-text{font-size:13px;color:var(--text);line-height:1.6}
+.manual-item-text strong{color:var(--lime);font-weight:700}
+.manual-divider{height:1px;background:var(--border2);margin:16px 0}
+.manual-tip-box{background:rgba(200,240,0,.05);border:1px solid rgba(200,240,0,.15);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.manual-tip-box p{font-size:12px;color:var(--muted);line-height:1.65}
+.manual-tip-box p strong{color:var(--text)}
+
+/* 개인정보 안내 (흐린 글씨) */
+.manual-privacy{padding:16px 22px 32px;margin-top:4px;border-top:1px solid var(--border2)}
+.manual-privacy-title{font-size:10px;letter-spacing:2px;color:rgba(106,127,150,.6);text-transform:uppercase;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.manual-privacy-title::before{content:'⚠';font-size:11px}
+.manual-privacy-body{font-size:11px;color:rgba(106,127,150,.5);line-height:1.75}
+.manual-privacy-body p{margin-bottom:6px}
+.manual-privacy-body .privacy-warn{font-size:10.5px;color:rgba(106,127,150,.38);line-height:1.8;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04)}
 
 /* NAV */
 .nav-tabs{display:flex;background:rgba(10,18,28,.6);border-bottom:1px solid var(--border2);padding:0 20px}
@@ -460,7 +489,10 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       </div>
     </div>
   </div>
-  <button class="admin-btn" id="adminAccessBtn">⚙ 관리자</button>
+  <div class="header-right">
+    <button class="help-btn" id="helpBtn" title="사용자 매뉴얼">?</button>
+    <button class="admin-btn" id="adminAccessBtn">⚙ 관리자</button>
+  </div>
 </header>
 
 <div class="nav-tabs">
@@ -729,6 +761,101 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
     <div class="admin-login-desc" id="pinModalDesc">등록 시 설정한 PIN을 입력하세요.</div>
     <div class="form-group"><label class="form-label">PIN (4자리)</label><input class="form-input" id="pinInput" type="number" placeholder="PIN 입력" style="-moz-appearance:textfield"></div>
     <button class="btn-submit" id="pinConfirmBtn">삭제 확인</button>
+  </div>
+</div>
+
+<!-- MODAL: 사용자 매뉴얼 -->
+<div class="manual-modal-bg" id="manualModalBg">
+  <div class="manual-modal" style="position:relative">
+    <button class="manual-close-btn" id="manualCloseBtn">✕</button>
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="margin-bottom:18px">📖 러너 사용 매뉴얼</div>
+
+    <!-- 섹션1: 러닝 인증하기 -->
+    <div class="manual-section">
+      <div class="manual-section-title">🏃 러닝 인증하기</div>
+      <div class="manual-item">
+        <div class="manual-item-num">1</div>
+        <div class="manual-item-text">화면 우하단 <strong>+ 버튼</strong>을 눌러 인증 폼을 엽니다.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">2</div>
+        <div class="manual-item-text"><strong>회원 선택</strong>에서 내 이름을 고릅니다.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">3</div>
+        <div class="manual-item-text"><strong>날짜</strong>와 <strong>거리(km)</strong>를 입력합니다.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">4</div>
+        <div class="manual-item-text"><strong>삭제 PIN</strong> 숫자 4자리를 설정합니다. 나중에 기록을 삭제할 때 필요해요.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">5</div>
+        <div class="manual-item-text">인증 사진을 첨부하고 <strong>인증 등록</strong>을 누르면 완료!</div>
+      </div>
+    </div>
+
+    <div class="manual-divider"></div>
+
+    <!-- 섹션2: 피드 & 랭킹 -->
+    <div class="manual-section">
+      <div class="manual-section-title">📊 피드 & 랭킹 보기</div>
+      <div class="manual-item">
+        <div class="manual-item-num">·</div>
+        <div class="manual-item-text"><strong>피드</strong> 탭에서 전체 크루원의 러닝 기록을 확인할 수 있어요.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">·</div>
+        <div class="manual-item-text"><strong>랭킹</strong> 탭에서 이달 남/여 거리 순위를 볼 수 있어요. 이름을 탭하면 개인 프로필로 이동합니다.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">·</div>
+        <div class="manual-item-text">상단 <strong>월 탭</strong>으로 과거 기록도 조회할 수 있습니다.</div>
+      </div>
+    </div>
+
+    <div class="manual-divider"></div>
+
+    <!-- 섹션3: 개인 프로필 -->
+    <div class="manual-section">
+      <div class="manual-section-title">🏅 개인 프로필 & 뱃지</div>
+      <div class="manual-item">
+        <div class="manual-item-num">·</div>
+        <div class="manual-item-text">랭킹에서 내 이름을 탭하면 <strong>개인 프로필</strong>로 이동해요.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">·</div>
+        <div class="manual-item-text"><strong>🎯 목표 뱃지</strong>를 눌러 이달 목표 거리를 직접 설정할 수 있어요.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">·</div>
+        <div class="manual-item-text"><strong>🔥 스트릭</strong> 탭에서 연속 인증 현황, <strong>🏅 뱃지</strong> 탭에서 달성 뱃지를 확인하세요.</div>
+      </div>
+    </div>
+
+    <div class="manual-divider"></div>
+
+    <!-- 섹션4: 기록 삭제 -->
+    <div class="manual-section">
+      <div class="manual-section-title">🗑 기록 삭제</div>
+      <div class="manual-tip-box">
+        <p>피드 카드 우측의 <strong>휴지통 아이콘</strong>을 누르면 삭제 팝업이 열려요.<br>
+        인증 시 설정한 <strong>PIN 4자리</strong>를 입력하면 본인 기록만 삭제할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <!-- 개인정보 안내 -->
+    <div class="manual-privacy">
+      <div class="manual-privacy-title">개인정보 및 이용 안내</div>
+      <div class="manual-privacy-body">
+        <p>· 러닝 기록 입력 시 개인정보 수집·이용에 동의한 것으로 간주합니다.</p>
+        <p>· 수집된 정보(이름, 러닝기록)는 BKRC 크루 내부 활동 목적으로만 사용됩니다.</p>
+        <div class="privacy-warn">
+          본 앱의 URL 및 크루원 개인정보(이름, 러닝기록 등)를 크루원 전체의 사전 동의 없이 외부에 공유·전달·게시하는 행위는 「개인정보 보호법」 제71조에 따라 형사처벌(5년 이하 징역 또는 5천만원 이하 벌금) 대상이 될 수 있으며, 이로 인한 민·형사상 법적 책임은 전적으로 반출자 본인에게 있습니다.
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1270,6 +1397,20 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
   }finally{
     btn.disabled=false;btn.textContent='인증 등록';
   }
+});
+
+// ══════════════════════════════════
+//  MODAL: 사용자 매뉴얼
+// ══════════════════════════════════
+document.getElementById('helpBtn').addEventListener('click',()=>{
+  document.getElementById('manualModalBg').classList.add('open');
+});
+document.getElementById('manualCloseBtn').addEventListener('click',()=>{
+  document.getElementById('manualModalBg').classList.remove('open');
+});
+document.getElementById('manualModalBg').addEventListener('click',e=>{
+  if(e.target===document.getElementById('manualModalBg'))
+    document.getElementById('manualModalBg').classList.remove('open');
 });
 
 // ══════════════════════════════════
