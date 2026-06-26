@@ -662,7 +662,7 @@ let photoDataUrl=null;
 document.getElementById('fabBtn').addEventListener('click',()=>{
   const sel=document.getElementById('inputName');
   sel.innerHTML=members.length
-    ?members.map(m=>`<option value="${esc(m.name)}">${esc(m.name)} (${m.gender==='m'?'남':'여'})</option>`).join('')
+    ?members.slice().sort((a,b)=>a.name.localeCompare(b.name,'ko')).map(m=>`<option value="${esc(m.name)}">${esc(m.name)} (${m.gender==='m'?'남':'여'})</option>`).join('')
     :`<option value="">회원 없음</option>`;
   document.getElementById('inputDate').value=todayStr();
   document.getElementById('inputKm').value='';
