@@ -1717,7 +1717,6 @@ function renderProfilePage(){
 
   // 페이스 추이 차트
   const paceLogsAll = myLogs.filter(l=>l.pace && /^\d+:\d{2}$/.test(l.pace));
-  const tlEl = document.getElementById('pTimeline');
   let paceChartHtml = '';
   if(paceLogsAll.length >= 2){
     // pace → 초 변환
