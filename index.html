@@ -728,6 +728,14 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       <div class="form-group"><label class="form-label">날짜</label><input class="form-input" id="inputDate" type="date"></div>
       <div class="form-group"><label class="form-label">거리 (km)</label><input class="form-input" id="inputKm" type="number" placeholder="0.0" step="0.1" min="0"></div>
     </div>
+    <div class="form-group">
+      <label class="form-label">페이스 (선택)</label>
+      <div style="position:relative">
+        <input class="form-input" id="inputPace" type="text" placeholder="5:30" maxlength="5" style="padding-right:46px" oninput="formatPaceInput(this)">
+        <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);pointer-events:none">/km</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.5px">분:초 형식으로 입력 (예: 5:30)</div>
+    </div>
     <div class="form-group"><label class="form-label">메모 (선택)</label><input class="form-input" id="inputMemo" type="text" placeholder="오늘 러닝 한마디!"></div>
     <div class="form-group"><label class="form-label">삭제 PIN (숫자 4자리)</label><input class="form-input" id="inputPin" type="number" placeholder="나중에 삭제할 때 필요해요" maxlength="4" style="-moz-appearance:textfield"></div>
     <div class="form-group">
@@ -784,7 +792,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       </div>
       <div class="manual-item">
         <div class="manual-item-num">3</div>
-        <div class="manual-item-text"><strong>날짜</strong>와 <strong>거리(km)</strong>를 입력합니다.</div>
+        <div class="manual-item-text"><strong>날짜</strong>와 <strong>거리(km)</strong>를 입력합니다. 페이스(예: 5:30)도 선택 입력할 수 있어요.</div>
       </div>
       <div class="manual-item">
         <div class="manual-item-num">4</div>
@@ -845,15 +853,13 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       </div>
     </div>
 
-    <!-- 개인정보 안내 -->
-    <div class="manual-privacy">
-      <div class="manual-privacy-title">개인정보 및 이용 안내</div>
-      <div class="manual-privacy-body">
+    <!-- 개인정보 안내 (최하단 분리) -->
+    <div style="margin-top:30px;padding:18px 0 36px;border-top:1px solid rgba(255,255,255,.04)">
+      <div style="font-size:9px;letter-spacing:1.5px;color:rgba(106,127,150,.35);text-transform:uppercase;font-weight:700;margin-bottom:8px">개인정보 및 이용 안내</div>
+      <div style="font-size:10px;color:rgba(106,127,150,.3);line-height:1.8">
         <p>· 러닝 기록 입력 시 개인정보 수집·이용에 동의한 것으로 간주합니다.</p>
-        <p>· 수집된 정보(이름, 러닝기록)는 BKRC 크루 내부 활동 목적으로만 사용됩니다.</p>
-        <div class="privacy-warn">
-          본 앱의 URL 및 크루원 개인정보(이름, 러닝기록 등)를 크루원 전체의 사전 동의 없이 외부에 공유·전달·게시하는 행위는 「개인정보 보호법」 제71조에 따라 형사처벌(5년 이하 징역 또는 5천만원 이하 벌금) 대상이 될 수 있으며, 이로 인한 민·형사상 법적 책임은 전적으로 반출자 본인에게 있습니다.
-        </div>
+        <p>· 수집된 정보는 BKRC 크루 내부 활동 목적으로만 사용됩니다.</p>
+        <p style="margin-top:8px;font-size:9.5px;color:rgba(106,127,150,.22);line-height:1.75">크루원 개인정보 및 본 앱 URL을 사전 동의 없이 외부에 공유·게시하는 행위는 「개인정보 보호법」에 따라 법적 책임이 따를 수 있습니다.</p>
       </div>
     </div>
   </div>
@@ -862,6 +868,19 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 <div class="toast" id="toast"></div>
 
 <script type="module">
+// 페이스 입력 포맷 (자동으로 5:30 형식 유지)
+window.formatPaceInput = function(el){
+  let v = el.value.replace(/[^0-9:]/g,'');
+  // 콜론 자동 삽입: 숫자 2자리 입력 후
+  if(v.length===2 && !v.includes(':')) v = v+':';
+  // 콜론 두 개 방지
+  const parts = v.split(':');
+  if(parts.length>2) v = parts[0]+':'+parts[1];
+  // 초 최대 2자리
+  if(parts[1]&&parts[1].length>2) v = parts[0]+':'+parts[1].slice(0,2);
+  el.value = v;
+};
+
 // ══════════════════════════════════
 //  FIREBASE INIT
 // ══════════════════════════════════
@@ -989,6 +1008,7 @@ function renderFeedPage(){
           </div>
           <div class="log-actions">
             <div class="log-km">${parseFloat(log.km).toFixed(1)}<span>km</span></div>
+            ${log.pace?`<div style="font-size:10px;color:var(--muted);text-align:right;margin-top:1px;letter-spacing:.5px">${log.pace}<span style="font-size:9px">/km</span></div>`:''}
             <button class="log-delete" onclick="deleteLog('${log.id}')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6M10,11v6M14,11v6M9,6V4h6v2"/></svg></button>
           </div>
         </div>
@@ -1345,6 +1365,7 @@ document.getElementById('fabBtn').addEventListener('click',()=>{
     :`<option value="">회원 없음</option>`;
   document.getElementById('inputDate').value=todayStr();
   document.getElementById('inputKm').value='';
+  document.getElementById('inputPace').value='';
   document.getElementById('inputMemo').value='';
   clearPhoto();
   document.getElementById('regModalBg').classList.add('open');
@@ -1380,6 +1401,7 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
   const name=document.getElementById('inputName').value;
   const date=document.getElementById('inputDate').value;
   const km=parseFloat(document.getElementById('inputKm').value);
+  const pace=document.getElementById('inputPace').value.trim();
   const memo=document.getElementById('inputMemo').value.trim();
   const pin=String(document.getElementById('inputPin').value).trim();
   if(!name){showToast('회원을 선택해 주세요');return}
@@ -1389,7 +1411,7 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
   const btn=document.getElementById('btnSubmit');
   btn.disabled=true;btn.textContent='저장 중...';
   try{
-    const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,memo,photo:photoDataUrl||null,pin,createdAt:Date.now()};
+    const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,pace:pace||null,memo,photo:photoDataUrl||null,pin,createdAt:Date.now()};
     await saveLog(log);
     feedMonth=getMonthKey(date);clearPhoto();closeRegModal();
     document.getElementById('inputPin').value='';
@@ -1693,6 +1715,67 @@ function renderProfilePage(){
     remain>0 ? `목표까지 <span class="${hiCls}">${remain}km</span> 남음` : `🎉 이달 목표 달성!`;
   document.getElementById('goalBadgeVal').textContent = profileGoal;
 
+  // 페이스 추이 차트
+  const paceLogsAll = myLogs.filter(l=>l.pace && /^\d+:\d{2}$/.test(l.pace));
+  const tlEl = document.getElementById('pTimeline');
+  let paceChartHtml = '';
+  if(paceLogsAll.length >= 2){
+    // pace → 초 변환
+    function paceToSec(p){ const [m,s]=p.split(':').map(Number); return m*60+(s||0); }
+    function secToPace(s){ return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+    const paceSorted = myLogs
+      .filter(l=>l.pace && /^\d+:\d{2}$/.test(l.pace))
+      .slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const paceVals = paceSorted.map(l=>paceToSec(l.pace));
+    const paceMin = Math.min(...paceVals);
+    const paceMax = Math.max(...paceVals);
+    const range = paceMax - paceMin || 30;
+    const W=300, H=80, padL=4, padR=4, padT=10, padB=8;
+    const xStep = paceSorted.length>1 ? (W-padL-padR)/(paceSorted.length-1) : 0;
+    const pts = paceVals.map((v,i)=>{
+      const x = padL + i*xStep;
+      // 페이스가 낮을수록(빠를수록) 위에 → 반전
+      const y = padT + ((v-paceMin)/(range))*(H-padT-padB);
+      return {x,y,v,log:paceSorted[i]};
+    });
+    const polyline = pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const bestIdx = paceVals.indexOf(paceMin);
+    const areaPts = `${pts[0].x.toFixed(1)},${H} ${polyline} ${pts[pts.length-1].x.toFixed(1)},${H}`;
+    const accentColor = isM ? '#4FC3F7' : '#F48FB1';
+    const gradId = `pg_${Date.now()}`;
+
+    paceChartHtml = `
+    <div style="margin:0 0 18px;background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:14px 16px 10px;overflow:hidden">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+        <span>⏱ 페이스 추이</span>
+        <span style="font-size:9px;color:rgba(106,127,150,.5)">낮을수록 빠름</span>
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${accentColor}" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="${accentColor}" stop-opacity="0.01"/>
+          </linearGradient>
+        </defs>
+        <!-- 면적 -->
+        <polygon points="${areaPts}" fill="url(#${gradId})"/>
+        <!-- 라인 -->
+        <polyline points="${polyline}" fill="none" stroke="${accentColor}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        <!-- 점 & 라벨 -->
+        ${pts.map((p,i)=>{
+          const isBest = i===bestIdx;
+          return`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${isBest?4:2.5}" fill="${isBest?accentColor:'var(--card)'}" stroke="${accentColor}" stroke-width="1.5"/>
+          ${isBest?`<text x="${p.x.toFixed(1)}" y="${(p.y-7).toFixed(1)}" text-anchor="middle" font-size="8" fill="${accentColor}" font-weight="700">${secToPace(p.v)}</text>`:''}`;
+        }).join('')}
+      </svg>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span style="font-size:9px;color:var(--muted)">${paceSorted[0].date.slice(5).replace('-','/')}</span>
+        <span style="font-size:9px;color:${accentColor};font-weight:700">최고 ${secToPace(paceMin)}</span>
+        <span style="font-size:9px;color:var(--muted)">${paceSorted[paceSorted.length-1].date.slice(5).replace('-','/')}</span>
+      </div>
+    </div>`;
+  }
+
   // 타임라인 (이달 기록, 최신순)
   const sorted = myLogs.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
   const tlEl = document.getElementById('pTimeline');
@@ -1701,7 +1784,7 @@ function renderProfilePage(){
   } else {
     const [yr,mon] = thisMonth.split('-').map(Number);
     const monthNames=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    tlEl.innerHTML=`<div class="tl-month-label">${monthNames[mon-1]} ${yr}</div><div class="timeline">${
+    tlEl.innerHTML=paceChartHtml+`<div class="tl-month-label">${monthNames[mon-1]} ${yr}</div><div class="timeline">${
       sorted.map((log,i)=>{
         const d=new Date(log.date);
         const ds=`${d.getMonth()+1}월 ${d.getDate()}일 (${['일','월','화','수','목','금','토'][d.getDay()]})`;
@@ -1714,6 +1797,7 @@ function renderProfilePage(){
             <div class="tl-card-body">
               <div class="tl-date-lbl">${ds}</div>
               <div class="tl-km-big ${colorCls}">${parseFloat(log.km).toFixed(1)}<span>km</span></div>
+              ${log.pace?`<div style="font-size:11px;color:var(--muted);margin-top:1px;letter-spacing:.5px">⏱ ${log.pace}<span style="font-size:10px">/km</span></div>`:''}
               ${log.memo?`<div class="tl-memo-text">${esc(log.memo)}</div>`:''}
             </div>
           </div>
