@@ -253,6 +253,199 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 /* ══ DAY LOGS ══ */
 .day-logs-header{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1.5px;color:var(--lime);padding:0 2px 10px;display:flex;align-items:center;gap:8px}
 .day-logs-list{display:flex;flex-direction:column;gap:8px;padding-bottom:20px}
+
+/* ══ PROFILE PAGE ══ */
+.profile-header-wrap{
+  background:linear-gradient(160deg,#0e2236 0%,var(--bg) 85%);
+  padding:20px 20px 0;
+  border-bottom:1px solid var(--border2);
+  position:relative;
+}
+.profile-back-btn{
+  display:flex;align-items:center;gap:6px;
+  background:none;border:none;color:var(--muted);
+  font-size:12px;letter-spacing:1px;cursor:pointer;padding:0;margin-bottom:18px;
+  font-family:'Noto Sans KR',sans-serif;transition:color .2s;
+}
+.profile-back-btn:hover{color:var(--text)}
+.profile-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.profile-avatar{
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,#1e3a50,#0e2236);
+  border:2px solid var(--male);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:var(--male);
+  flex-shrink:0;box-shadow:0 0 18px rgba(79,195,247,.2);
+}
+.profile-avatar.female{border-color:var(--female);color:var(--female);box-shadow:0 0 18px rgba(244,143,177,.2)}
+.profile-info{flex:1}
+.profile-name-text{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;letter-spacing:1px;line-height:1}
+.profile-sub{display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap}
+.profile-rank-text{font-size:12px;color:var(--muted)}
+
+/* 목표 뱃지 (우측 상단) */
+.goal-badge{
+  position:absolute;top:20px;right:20px;
+  background:var(--card);border:1px solid rgba(200,240,0,.3);
+  border-radius:20px;padding:5px 10px 5px 8px;
+  display:flex;align-items:center;gap:5px;
+  cursor:pointer;transition:all .2s;box-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+.goal-badge:hover{border-color:var(--lime);background:rgba(200,240,0,.06)}
+.goal-badge-icon{font-size:12px;line-height:1}
+.goal-badge-val{font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;color:var(--lime);line-height:1}
+.goal-badge-unit{font-size:9px;color:var(--muted);line-height:1}
+
+/* 목표 인라인 에디터 (뱃지 클릭 시 등장) */
+.goal-editor-popup{
+  position:absolute;top:52px;right:20px;z-index:50;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:14px;padding:12px 14px;width:180px;
+  box-shadow:0 8px 28px rgba(0,0,0,.4);
+  display:none;
+}
+.goal-editor-popup.open{display:block;animation:popIn .18s ease}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(-6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.goal-editor-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);margin-bottom:7px;text-transform:uppercase}
+.goal-editor-row{display:flex;align-items:center;gap:6px}
+.goal-editor-input{
+  flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;padding:7px 10px;color:var(--text);
+  font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;
+  outline:none;transition:border-color .2s;width:0;
+}
+.goal-editor-input:focus{border-color:rgba(200,240,0,.4)}
+.goal-editor-unit{font-size:11px;color:var(--muted);white-space:nowrap}
+.goal-editor-save{
+  width:100%;margin-top:9px;padding:8px;
+  background:var(--lime);color:#0D1B2A;border:none;border-radius:8px;
+  font-size:11px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;letter-spacing:.5px;transition:opacity .2s;
+}
+.goal-editor-save:hover{opacity:.85}
+
+/* stat strip */
+.stat-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border2);border-top:1px solid var(--border2)}
+.stat-cell{background:var(--bg);padding:13px 0;text-align:center}
+.stat-cell-val{font-family:'Oswald',sans-serif;font-size:21px;font-weight:700;color:var(--lime);line-height:1}
+.stat-cell-lbl{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.5px}
+
+/* profile tabs */
+.profile-tabs{display:flex;background:rgba(10,18,28,.9);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:10;backdrop-filter:blur(8px)}
+.profile-tab{flex:1;padding:12px 0;text-align:center;font-size:11px;letter-spacing:1.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-weight:500;text-transform:uppercase}
+.profile-tab.active{color:var(--lime);border-bottom-color:var(--lime)}
+.ptab-panel{display:none}.ptab-panel.active{display:block}
+.profile-content{padding:16px 20px 100px}
+
+/* month summary card */
+.month-summary-card{
+  background:var(--card);border:1px solid var(--border2);border-radius:14px;
+  padding:14px 16px;margin-bottom:14px;
+}
+.ms-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ms-title{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1.5px;color:var(--text)}
+.ms-total-km{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;line-height:1}
+.ms-total-km span{font-size:11px;font-family:'Noto Sans KR',sans-serif;opacity:.7}
+.ms-bar-bg{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.ms-bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.ms-bar-fill.male-bar{background:var(--male);box-shadow:0 0 8px rgba(79,195,247,.3)}
+.ms-bar-fill.female-bar{background:var(--female);box-shadow:0 0 8px rgba(244,143,177,.3)}
+.ms-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:.3px}
+.ms-meta span.hi-m{color:var(--male)}.ms-meta span.hi-f{color:var(--female)}
+
+/* timeline */
+.tl-month-label{
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;
+  color:var(--lime);text-transform:uppercase;padding:14px 0 8px;font-weight:700;
+}
+.timeline{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:12px;position:relative;padding-bottom:12px}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:34px;flex-shrink:0}
+.tl-dot-run{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);flex-shrink:0;margin-top:5px}
+.tl-dot-run.male-dot{background:var(--male);box-shadow:0 0 8px rgba(79,195,247,.4)}
+.tl-dot-run.female-dot{background:var(--female);box-shadow:0 0 8px rgba(244,143,177,.4)}
+.tl-dot-run.rest{background:rgba(255,255,255,.1);box-shadow:none}
+.tl-line{flex:1;width:2px;background:var(--border2);margin-top:3px;min-height:16px}
+.tl-item:last-child .tl-line{display:none}
+.tl-card-run{flex:1;background:var(--card);border:1px solid var(--border2);border-radius:12px;overflow:hidden}
+.tl-photo{width:100%;max-height:180px;object-fit:cover;display:block}
+.tl-card-body{padding:10px 13px}
+.tl-date-lbl{font-size:11px;color:var(--muted);margin-bottom:4px}
+.tl-km-big{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;line-height:1}
+.tl-km-big.male-c{color:var(--male)}.tl-km-big.female-c{color:var(--female)}
+.tl-km-big span{font-size:12px;font-family:'Noto Sans KR',sans-serif;opacity:.7}
+.tl-memo-text{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;padding-top:6px;border-top:1px solid var(--border2)}
+.tl-norun{flex:1;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.07);border-radius:12px;padding:9px 13px;font-size:11px;color:rgba(255,255,255,.18);display:flex;align-items:center;gap:6px}
+
+/* streak card */
+.streak-card{
+  background:var(--card);border:1px solid var(--border2);border-radius:14px;
+  padding:16px;margin-bottom:14px;position:relative;overflow:hidden;
+}
+.streak-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FF6B35,#FF8C42,#FFB347)}
+.streak-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.streak-label-txt{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.streak-num{font-family:'Oswald',sans-serif;font-size:38px;font-weight:700;color:#FF8C42;line-height:1}
+.streak-unit{font-size:13px;color:#FF8C42;opacity:.85}
+.streak-flame{font-size:30px;margin-top:4px}
+.streak-week{display:flex;gap:5px;margin-top:2px}
+.week-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.week-lbl{font-size:9px;color:var(--muted);letter-spacing:.5px}
+.week-dot-bar{width:100%;height:7px;border-radius:4px;background:rgba(255,255,255,.07)}
+.week-dot-bar.done{background:#FF8C42;box-shadow:0 0 6px rgba(255,140,66,.45)}
+.week-dot-bar.today{background:linear-gradient(90deg,#FF8C42,#FFB347);animation:pulse 1.5s infinite}
+.streak-stats{display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2)}
+.streak-stat{text-align:center;flex:1}
+.streak-stat-val{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;color:var(--text)}
+.streak-stat-lbl{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.5px}
+
+/* badge grid */
+.badge-section{margin-bottom:20px}
+.badge-section-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:8px}
+.badge-section-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+.badge-grid-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.badge-item-card{background:var(--card);border:1px solid var(--border2);border-radius:13px;padding:14px 8px 12px;text-align:center;position:relative;transition:all .25s}
+.badge-item-card.unlocked{border-color:rgba(200,240,0,.25);background:linear-gradient(160deg,rgba(200,240,0,.06),var(--card))}
+.badge-item-card.locked{opacity:.38;filter:grayscale(.7)}
+.badge-icon-big{font-size:26px;margin-bottom:7px;display:block;line-height:1}
+.badge-item-name{font-size:10px;font-weight:700;letter-spacing:.3px;color:var(--text);margin-bottom:3px;line-height:1.3}
+.badge-item-desc{font-size:9px;color:var(--muted);line-height:1.4}
+.badge-check-mark{position:absolute;top:7px;right:7px;width:15px;height:15px;background:var(--lime);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.tier-lbl{font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:4px;letter-spacing:.5px}
+.tier-bronze{background:rgba(180,120,60,.2);color:#cd7f32}
+.tier-silver{background:rgba(180,180,200,.15);color:#b0b8c8}
+.tier-gold{background:rgba(255,209,102,.15);color:#FFD166}
+.tier-special{background:rgba(200,240,0,.12);color:var(--lime)}
+.badge-summary-bar{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.bs-left-txt{font-size:13px;color:var(--text);font-weight:500}
+.bs-left-txt span{color:var(--lime);font-family:'Oswald',sans-serif;font-size:16px;font-weight:700}
+.bs-right-txt{font-size:11px;color:var(--muted)}
+.bs-dots-row{display:flex;gap:3px;margin-top:5px}
+.bs-dot-sq{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.07)}
+.bs-dot-sq.on{background:var(--lime)}
+
+/* 달성 달력 */
+.mini-cal-card{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;margin-top:14px}
+.mini-cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.mini-cal-title{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1.5px;color:var(--text)}
+.mini-cal-count{font-size:11px;color:var(--muted)}
+.mini-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
+.mini-cal-wd{text-align:center;font-size:8px;color:var(--muted);padding:2px 0;letter-spacing:.3px}
+.mini-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.mini-cal-day{height:22px;border-radius:5px;background:rgba(255,255,255,.06)}
+.mini-cal-day.done-m{background:var(--male);opacity:.85}
+.mini-cal-day.done-f{background:var(--female);opacity:.85}
+.mini-cal-day.today-day{outline:2px solid var(--lime);outline-offset:1px}
+.mini-cal-day.empty-day{background:transparent}
+.mini-cal-legend{display:flex;gap:10px;align-items:center;margin-top:8px;font-size:10px;color:var(--muted)}
+.mini-cal-legend span{display:flex;align-items:center;gap:4px}
+.legend-dot{width:8px;height:8px;border-radius:2px;display:inline-block}
+
+/* clickable rank name */
+.rank-name-link{cursor:pointer;text-decoration:none;color:inherit;display:flex;align-items:center;gap:6px;transition:color .15s}
+.rank-name-link:hover{color:var(--lime)}
+.podium-name-link{cursor:pointer;transition:color .15s}
+.podium-name-link:hover{color:var(--lime)}
 </style>
 </head>
 <body>
@@ -273,6 +466,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 <div class="nav-tabs">
   <div class="nav-tab active" data-page="feed">피드</div>
   <div class="nav-tab" data-page="ranking">랭킹</div>
+  <div class="nav-tab" data-page="profile" id="profileNavTab" style="display:none">개인피드</div>
 </div>
 
 <!-- ══ FEED ══ -->
@@ -307,6 +501,99 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
   </div>
   <div class="ranking-wrap">
     <div id="rankContent"></div>
+  </div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div class="page" id="page-profile">
+  <!-- 헤더 -->
+  <div class="profile-header-wrap" id="profileHeaderWrap">
+    <button class="profile-back-btn" id="profileBackBtn">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+      랭킹으로 돌아가기
+    </button>
+    <!-- 목표 뱃지 (우측 상단) -->
+    <div class="goal-badge" id="goalBadge" onclick="toggleGoalEditor()">
+      <span class="goal-badge-icon">🎯</span>
+      <span class="goal-badge-val" id="goalBadgeVal">100</span>
+      <span class="goal-badge-unit">km 목표</span>
+    </div>
+    <!-- 목표 편집 팝업 -->
+    <div class="goal-editor-popup" id="goalEditorPopup">
+      <div class="goal-editor-label">이달 목표 설정</div>
+      <div class="goal-editor-row">
+        <input class="goal-editor-input" id="goalEditorInput" type="number" min="1" max="999" step="1" value="100">
+        <span class="goal-editor-unit">km</span>
+      </div>
+      <button class="goal-editor-save" onclick="saveGoalEditor()">저장 ✓</button>
+    </div>
+    <div class="profile-top">
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="profile-info">
+        <div class="profile-name-text" id="profileNameText">—</div>
+        <div class="profile-sub">
+          <span class="gender-badge" id="profileGenderBadge"></span>
+          <span class="profile-rank-text" id="profileRankText"></span>
+        </div>
+      </div>
+    </div>
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="stat-cell-val" id="pStatKm">—</div><div class="stat-cell-lbl">이달 km</div></div>
+      <div class="stat-cell"><div class="stat-cell-val" id="pStatCnt">—</div><div class="stat-cell-lbl">인증 횟수</div></div>
+      <div class="stat-cell"><div class="stat-cell-val" id="pStatAvg">—</div><div class="stat-cell-lbl">평균 km</div></div>
+    </div>
+  </div>
+  <!-- 탭 -->
+  <div class="profile-tabs">
+    <div class="profile-tab active" onclick="switchPTab(0)">🏃 기록</div>
+    <div class="profile-tab" onclick="switchPTab(1)">🔥 스트릭</div>
+    <div class="profile-tab" onclick="switchPTab(2)">🏅 뱃지</div>
+  </div>
+  <!-- TAB 0: 기록 -->
+  <div class="ptab-panel active" id="ptab0">
+    <div class="profile-content">
+      <div class="month-summary-card">
+        <div class="ms-header">
+          <div class="ms-title" id="pMsTitle">—</div>
+          <div class="ms-total-km" id="pMsTotal">—</div>
+        </div>
+        <div class="ms-bar-bg"><div class="ms-bar-fill" id="pGoalBar" style="width:0%"></div></div>
+        <div class="ms-meta">
+          <span id="pGoalRemain">—</span>
+          <span id="pGoalPct">—</span>
+        </div>
+      </div>
+      <div id="pTimeline"></div>
+    </div>
+  </div>
+  <!-- TAB 1: 스트릭 -->
+  <div class="ptab-panel" id="ptab1">
+    <div class="profile-content">
+      <div class="streak-card">
+        <div class="streak-top">
+          <div>
+            <div class="streak-label-txt">현재 연속 인증</div>
+            <div style="display:flex;align-items:baseline;gap:5px;margin-top:3px">
+              <div class="streak-num" id="pStreakNum">0</div>
+              <div class="streak-unit">일 연속</div>
+            </div>
+          </div>
+          <div class="streak-flame">🔥</div>
+        </div>
+        <div class="streak-week" id="pStreakWeek"></div>
+        <div class="streak-stats">
+          <div class="streak-stat"><div class="streak-stat-val" id="pStreakCur">0</div><div class="streak-stat-lbl">현재 연속</div></div>
+          <div class="streak-stat"><div class="streak-stat-val" id="pStreakMax">0</div><div class="streak-stat-lbl">역대 최장</div></div>
+          <div class="streak-stat"><div class="streak-stat-val" id="pStreakMonth">0</div><div class="streak-stat-lbl">이달 최장</div></div>
+          <div class="streak-stat"><div class="streak-stat-val" id="pStreakTotal">0</div><div class="streak-stat-lbl">총 인증일</div></div>
+        </div>
+      </div>
+      <div id="pMiniCal"></div>
+    </div>
+  </div>
+  <!-- TAB 2: 뱃지 -->
+  <div class="ptab-panel" id="ptab2">
+    <div class="profile-content" id="pBadgeContent"></div>
   </div>
 </div>
 
@@ -624,7 +911,7 @@ function podiumHTML(ranked, colorClass, barClass, themeClass){
     </div>`;
     return`<div class="podium-card ${pcls[i]}${i===0?' '+themeClass:''}">
       <div class="podium-medal">${medals[i]}</div>
-      <div class="podium-name">${esc(r.name)}</div>
+      <div class="podium-name podium-name-link" onclick="openProfile('${esc(r.name)}')">${esc(r.name)} <span style="font-size:9px;opacity:.55">›</span></div>
       <div class="podium-km ${colorClass}">${r.km.toFixed(1)}<span>km</span></div>
       <div class="podium-count">${r.cnt}회 인증</div>
     </div>`;
@@ -637,7 +924,7 @@ function rankListHTML(ranked, colorClass, barClass, startIdx=4){
     `<div class="rank-row">
       <div class="rank-num">${i+startIdx}</div>
       <div class="rank-info">
-        <div class="rank-name">${esc(r.name)}</div>
+        <div class="rank-name"><span class="rank-name-link" onclick="openProfile('${esc(r.name)}')">${esc(r.name)} <span style="font-size:11px;color:var(--lime);opacity:.6">›</span></span></div>
         <div class="rank-sub">${r.cnt}회 인증</div>
         <div class="rank-bar-wrap"><div class="rank-bar ${barClass}" style="width:${(r.km/maxKm*100).toFixed(1)}%"></div></div>
       </div>
@@ -664,6 +951,11 @@ function renderRankContent(){
 function renderRankingPage(){
   rankMonth=renderMonthTabs('rankMonthTabs',rankMonth,m=>{rankMonth=m;renderRankingPage()});
   renderRankContent();
+  // 첫 진입 시 한 번만 안내 토스트
+  if(!sessionStorage.getItem('bkrc_rank_tip')){
+    sessionStorage.setItem('bkrc_rank_tip','1');
+    setTimeout(()=>showToast('👆 이름을 탭하면 개인피드를 볼 수 있어요'),600);
+  }
 }
 
 // ══════════════════════════════════
@@ -911,6 +1203,7 @@ document.querySelectorAll('.nav-tab').forEach(tab=>{
     document.getElementById('fabBtn').classList.toggle('hidden',p!=='feed');
     currentPage=p;
     if(p==='ranking')renderRankingPage();
+    if(p==='profile')renderProfilePage();
   });
 });
 
@@ -1173,6 +1466,359 @@ function downloadStatsCSV(){
   showToast(`📊 ${sorted.length}명 데이터 다운로드 완료`);
 }
 document.getElementById('btnDownloadStats').addEventListener('click', downloadStatsCSV);
+
+// ══════════════════════════════════
+//  PROFILE PAGE
+// ══════════════════════════════════
+let profileMember = null; // 현재 열린 멤버명
+let profileGoal   = 100;  // 개인 목표 km
+
+function openProfile(name){
+  profileMember = name;
+  // 목표 복원
+  const savedGoal = parseFloat(localStorage.getItem('bkrc_goal_'+name)||'100')||100;
+  profileGoal = savedGoal;
+  document.getElementById('goalEditorInput').value = savedGoal;
+  document.getElementById('goalBadgeVal').textContent = savedGoal;
+
+  // 네비 탭 표시
+  const profileNavTab = document.getElementById('profileNavTab');
+  profileNavTab.style.display = '';
+  profileNavTab.textContent = name;
+
+  // 페이지 전환
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  profileNavTab.classList.add('active');
+  document.getElementById('page-profile').classList.add('active');
+  document.getElementById('fabBtn').classList.add('hidden');
+  currentPage = 'profile';
+
+  switchPTab(0);
+  renderProfilePage();
+  document.getElementById('page-profile').scrollTo(0,0);
+  window.scrollTo(0,0);
+}
+window.openProfile = openProfile;
+
+function renderProfilePage(){
+  if(!profileMember) return;
+  const name = profileMember;
+  const g = getMemberGender(name);
+  const isM = g==='m';
+  const colorCls = isM?'male-c':'female-c';
+  const barCls   = isM?'male-bar':'female-bar';
+  const dotCls   = isM?'male-dot':'female-dot';
+  const hiCls    = isM?'hi-m':'hi-f';
+
+  // 아바타
+  const av = document.getElementById('profileAvatar');
+  av.textContent = name.charAt(0);
+  av.className = 'profile-avatar'+(isM?'':' female');
+
+  // 이름 / 성별
+  document.getElementById('profileNameText').textContent = name;
+  const gb = document.getElementById('profileGenderBadge');
+  gb.textContent = isM?'남':'여';
+  gb.className = 'gender-badge '+(isM?'gb-m':'gb-f');
+
+  // 랭킹 계산
+  const thisMonth = thisMonthKey();
+  const ranked = buildRanked(isM?'male':'female');
+  const myIdx  = ranked.findIndex(r=>r.name===name);
+  const rankLabel = myIdx>=0? (myIdx===0?'🥇':myIdx===1?'🥈':myIdx===2?'🥉':'')+(myIdx+1)+'위' : '기록 없음';
+  document.getElementById('profileRankText').textContent = (isM?'남자반':'여자반')+' '+rankLabel;
+
+  // 이달 통계
+  const myLogs = logs.filter(l=>getMonthKey(l.date)===thisMonth && l.name===name);
+  const totalKm = myLogs.reduce((s,l)=>s+parseFloat(l.km||0),0);
+  const cnt = myLogs.length;
+  document.getElementById('pStatKm').textContent  = totalKm.toFixed(1);
+  document.getElementById('pStatCnt').textContent = cnt;
+  document.getElementById('pStatAvg').textContent = cnt?( totalKm/cnt).toFixed(1):'0.0';
+
+  // 목표 바
+  const pct = Math.min((totalKm/profileGoal)*100,100);
+  const remain = Math.max(profileGoal-totalKm,0).toFixed(1);
+  const barEl = document.getElementById('pGoalBar');
+  barEl.style.width = pct.toFixed(1)+'%';
+  barEl.className = 'ms-bar-fill '+(isM?'male-bar':'female-bar');
+  const [y,mo] = thisMonth.split('-').map(Number);
+  document.getElementById('pMsTitle').textContent = `${y}년 ${mo}월`;
+  document.getElementById('pMsTotal').innerHTML = `${totalKm.toFixed(1)}<span>km</span>`;
+  document.getElementById('pMsTotal').className = 'ms-total-km '+(isM?'male-c':'female-c');
+  document.getElementById('pGoalPct').textContent = pct.toFixed(0)+'%';
+  document.getElementById('pGoalRemain').innerHTML =
+    remain>0 ? `목표까지 <span class="${hiCls}">${remain}km</span> 남음` : `🎉 이달 목표 달성!`;
+  document.getElementById('goalBadgeVal').textContent = profileGoal;
+
+  // 타임라인 (이달 기록, 최신순)
+  const sorted = myLogs.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tlEl = document.getElementById('pTimeline');
+  if(!sorted.length){
+    tlEl.innerHTML=`<div class="empty-state"><svg width="40" height="40" fill="none" stroke="#6A7F96" stroke-width="1.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg><p>이번 달 기록이 없어요</p></div>`;
+  } else {
+    const [yr,mon] = thisMonth.split('-').map(Number);
+    const monthNames=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    tlEl.innerHTML=`<div class="tl-month-label">${monthNames[mon-1]} ${yr}</div><div class="timeline">${
+      sorted.map((log,i)=>{
+        const d=new Date(log.date);
+        const ds=`${d.getMonth()+1}월 ${d.getDate()}일 (${['일','월','화','수','목','금','토'][d.getDay()]})`;
+        const photoHtml = log.photo
+          ? `<img class="tl-photo" src="${log.photo}" alt="">`
+          : '';
+        return`<div class="tl-item">
+          <div class="tl-left"><div class="tl-dot-run ${dotCls}"></div><div class="tl-line"></div></div>
+          <div class="tl-card-run">${photoHtml}
+            <div class="tl-card-body">
+              <div class="tl-date-lbl">${ds}</div>
+              <div class="tl-km-big ${colorCls}">${parseFloat(log.km).toFixed(1)}<span>km</span></div>
+              ${log.memo?`<div class="tl-memo-text">${esc(log.memo)}</div>`:''}
+            </div>
+          </div>
+        </div>`;
+      }).join('')
+    }</div>`;
+  }
+
+  // 스트릭 계산
+  const allMyLogs = logs.filter(l=>l.name===name);
+  const uniqueDates = [...new Set(allMyLogs.map(l=>l.date))].sort();
+  function calcStreak(dates){
+    if(!dates.length) return {cur:0,max:0,monthMax:0,total:dates.length};
+    let cur=1,max=1,run=1;
+    for(let i=1;i<dates.length;i++){
+      const prev=new Date(dates[i-1]), curr=new Date(dates[i]);
+      const diff=(curr-prev)/(1000*60*60*24);
+      if(diff===1){run++;max=Math.max(max,run)}else{run=1}
+    }
+    // current streak (from today backwards)
+    const today=new Date(todayStr());
+    let cs=0;
+    for(let i=dates.length-1;i>=0;i--){
+      const d=new Date(dates[i]);
+      const diff=Math.round((today-d)/(1000*60*60*24));
+      if(diff===cs){cs++}else break;
+    }
+    // this month max
+    const mDates=dates.filter(d=>getMonthKey(d)===thisMonth).sort();
+    let mMax=mDates.length?1:0, mRun=1;
+    for(let i=1;i<mDates.length;i++){
+      const diff=(new Date(mDates[i])-new Date(mDates[i-1]))/(1000*60*60*24);
+      if(diff===1){mRun++;mMax=Math.max(mMax,mRun)}else mRun=1;
+    }
+    return{cur:cs,max:Math.max(max,cs),monthMax:mMax,total:dates.length};
+  }
+  const streak = calcStreak(uniqueDates);
+  document.getElementById('pStreakNum').textContent = streak.cur;
+  document.getElementById('pStreakCur').textContent = streak.cur;
+  document.getElementById('pStreakMax').textContent = streak.max;
+  document.getElementById('pStreakMonth').textContent = streak.monthMax;
+  document.getElementById('pStreakTotal').textContent = streak.total;
+
+  // 이번 주 dots (월~일, 기준: 오늘)
+  const todayD = new Date(todayStr());
+  const dow = todayD.getDay(); // 0=일
+  const weekDays=['일','월','화','수','목','금','토'];
+  // 이번 주 일요일부터
+  const weekStart = new Date(todayD);
+  weekStart.setDate(todayD.getDate()-dow);
+  const weekHtml = Array.from({length:7},(_,i)=>{
+    const d=new Date(weekStart);
+    d.setDate(weekStart.getDate()+i);
+    const dk=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const isToday=dk===todayStr();
+    const hasRun=uniqueDates.includes(dk);
+    const cls=isToday?'today':hasRun?'done':'';
+    return`<div class="week-col"><div class="week-dot-bar ${cls}"></div><div class="week-lbl">${weekDays[i]}</div></div>`;
+  }).join('');
+  document.getElementById('pStreakWeek').innerHTML = weekHtml;
+
+  // 달성 달력
+  renderProfileMiniCal(name, isM, uniqueDates);
+
+  // 뱃지
+  renderProfileBadges(name, isM, totalKm, cnt, streak, myLogs);
+}
+
+function renderProfileMiniCal(name, isM, uniqueDates){
+  const el = document.getElementById('pMiniCal');
+  if(!el) return;
+  const thisMonth = thisMonthKey();
+  const [y,mo] = thisMonth.split('-').map(Number);
+  const firstDow = new Date(y,mo-1,1).getDay(); // 0=일
+  const lastDate  = new Date(y,mo,0).getDate();
+  const todayKey  = todayStr();
+  const doneCls   = isM ? 'done-m' : 'done-f';
+
+  // 이달 인증한 날짜 set
+  const doneSet = new Set(uniqueDates.filter(d=>getMonthKey(d)===thisMonth));
+  const doneCnt = doneSet.size;
+  const totalDaysSoFar = new Date()<=new Date(y,mo-1,lastDate) ? new Date().getDate() : lastDate;
+
+  // 요일 헤더
+  const wdHtml = ['일','월','화','수','목','금','토'].map(w=>`<div class="mini-cal-wd">${w}</div>`).join('');
+
+  // 날짜 셀
+  let cells = '';
+  for(let i=0;i<firstDow;i++) cells+=`<div class="mini-cal-day empty-day"></div>`;
+  for(let d=1;d<=lastDate;d++){
+    const dk=`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isDone  = doneSet.has(dk);
+    const isToday = dk===todayKey;
+    let cls = isDone ? doneCls : 'mini-cal-day';
+    if(!isDone) cls += '';
+    if(isToday) cls += ' today-day';
+    cells+=`<div class="mini-cal-day ${isDone?doneCls:''} ${isToday?'today-day':''}"></div>`;
+  }
+
+  const legendColor = isM ? 'var(--male)' : 'var(--female)';
+  el.innerHTML=`
+    <div class="mini-cal-card">
+      <div class="mini-cal-header">
+        <div class="mini-cal-title">${mo}월 인증 현황</div>
+        <div class="mini-cal-count">${doneCnt}일 / ${totalDaysSoFar}일</div>
+      </div>
+      <div class="mini-cal-weekdays">${wdHtml}</div>
+      <div class="mini-cal-days">${cells}</div>
+      <div class="mini-cal-legend">
+        <span><span class="legend-dot" style="background:${legendColor}"></span>인증</span>
+        <span><span class="legend-dot" style="background:rgba(255,255,255,.06)"></span>쉬는 날</span>
+        <span><span class="legend-dot" style="background:rgba(255,255,255,.06);outline:2px solid var(--lime);outline-offset:1px"></span>오늘</span>
+      </div>
+    </div>`;
+}
+
+function renderProfileBadges(name, isM, totalKm, cnt, streak, myLogs){
+  const allMyLogs = logs.filter(l=>l.name===name);
+  const maxSingleKm = Math.max(...allMyLogs.map(l=>parseFloat(l.km||0)), 0);
+  const allUnique = [...new Set(allMyLogs.map(l=>l.date))];
+
+  function badge(icon,bname,desc,tier,unlocked){
+    const cls = unlocked?'badge-item-card unlocked':'badge-item-card locked';
+    const check = unlocked?`<div class="badge-check-mark"><svg width="9" height="9" fill="none" stroke="#0D1B2A" stroke-width="2.5" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>`:'';
+    return`<div class="${cls}">${check}<span class="badge-icon-big">${icon}</span><div class="badge-item-name">${bname}</div><div class="badge-item-desc">${desc}</div><span class="tier-lbl ${tier.cls}">${tier.name}</span></div>`;
+  }
+  const STARTER={cls:'tier-bronze',name:'STARTER'};
+  const RUNNER={cls:'tier-silver',name:'RUNNER'};
+  const ELITE={cls:'tier-gold',name:'ELITE'};
+  const SPECIAL={cls:'tier-special',name:'SPECIAL'};
+  const MYGOAL={cls:'tier-special',name:'MY GOAL'};
+
+  const unlockedCount = [
+    cnt>=1,maxSingleKm>=5,maxSingleKm>=7,
+    maxSingleKm>=10,maxSingleKm>=15,maxSingleKm>=21.1,maxSingleKm>=42.195,maxSingleKm>=50,
+    streak.cur>=7,streak.cur>=30,cnt>=20,
+    allUnique.length>=90,
+    totalKm>=100,totalKm>=200,totalKm>=profileGoal,
+    false, // 성장 러너(전월 비교 미구현)
+    false,false,false,false // 스페셜(시간 정보 없음)
+  ].filter(Boolean).length;
+
+  const el=document.getElementById('pBadgeContent');
+  el.innerHTML=`
+    <div class="badge-summary-bar">
+      <div class="bs-left-txt"><span>${unlockedCount}</span> / 20 뱃지 획득</div>
+      <div>
+        <div class="bs-right-txt">달성률 ${Math.round(unlockedCount/20*100)}%</div>
+        <div class="bs-dots-row">${Array.from({length:20},(_,i)=>`<div class="bs-dot-sq${i<unlockedCount?' on':''}"></div>`).join('')}</div>
+      </div>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-title">🟤 스타터</div>
+      <div class="badge-grid-wrap">
+        ${badge('👟','첫 발걸음','이달 첫 러닝 인증',STARTER,cnt>=1)}
+        ${badge('5️⃣','파이브 클럽','하루 5km 돌파',STARTER,maxSingleKm>=5)}
+        ${badge('7️⃣','세븐 런','하루 7km 돌파',STARTER,maxSingleKm>=7)}
+      </div>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-title">⚪ 거리 도전</div>
+      <div class="badge-grid-wrap">
+        ${badge('🔟','10K 클럽','하루 10km 돌파',RUNNER,maxSingleKm>=10)}
+        ${badge('⚡','15K 러너','하루 15km 돌파',RUNNER,maxSingleKm>=15)}
+        ${badge('🏅','하프 정복','하루 21.1km 완주',RUNNER,maxSingleKm>=21.1)}
+        ${badge('🏆','풀코스','하루 42.195km 완주',ELITE,maxSingleKm>=42.195)}
+        ${badge('🦅','울트라맨','하루 50km 이상',ELITE,maxSingleKm>=50)}
+      </div>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-title">🟡 꾸준함</div>
+      <div class="badge-grid-wrap">
+        ${badge('🔥','불꽃 주간','7일 연속 인증',RUNNER,streak.cur>=7||streak.max>=7)}
+        ${badge('🌋','30일 스트릭','30일 연속 인증',ELITE,streak.max>=30)}
+        ${badge('📅','개근상','한 달 20회 이상',RUNNER,cnt>=20)}
+        ${badge('🗓','3개월 연속','3달 연속 인증 기록',ELITE,allUnique.length>=90)}
+      </div>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-title">🟡 누적 달성</div>
+      <div class="badge-grid-wrap">
+        ${badge('💯','센추리 클럽','한 달 100km 돌파',ELITE,totalKm>=100)}
+        ${badge('🏔','월간 200km','한 달 200km 돌파',ELITE,totalKm>=200)}
+        ${badge('🎯','목표 달성','개인 목표 100% 완수',MYGOAL,totalKm>=profileGoal)}
+        ${badge('📈','성장 러너','전월 대비 20% 증가',RUNNER,false)}
+      </div>
+    </div>
+    <div class="badge-section">
+      <div class="badge-section-title">✦ 스페셜</div>
+      <div class="badge-grid-wrap">
+        ${badge('🌅','새벽 러너','오전 6시 전 인증 3회',SPECIAL,false)}
+        ${badge('🌙','야간 러너','오후 9시 후 인증 3회',SPECIAL,false)}
+        ${badge('👥','크루 정신','같은 날 동시 인증 5회',SPECIAL,false)}
+        ${badge('⚡','스피드런','하루 2회 이상 인증',SPECIAL,false)}
+      </div>
+    </div>`;
+}
+
+function switchPTab(idx){
+  document.querySelectorAll('.profile-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.ptab-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+}
+window.switchPTab = switchPTab;
+
+function toggleGoalEditor(){
+  const pop = document.getElementById('goalEditorPopup');
+  pop.classList.toggle('open');
+  if(pop.classList.contains('open')){
+    document.getElementById('goalEditorInput').focus();
+    document.getElementById('goalEditorInput').select();
+  }
+}
+window.toggleGoalEditor = toggleGoalEditor;
+
+function saveGoalEditor(){
+  const v = parseFloat(document.getElementById('goalEditorInput').value);
+  if(!v||v<=0) return;
+  profileGoal = v;
+  if(profileMember) localStorage.setItem('bkrc_goal_'+profileMember, v);
+  document.getElementById('goalBadgeVal').textContent = v;
+  document.getElementById('goalEditorPopup').classList.remove('open');
+  renderProfilePage();
+  showToast(`🎯 목표 ${v}km 저장!`);
+}
+window.saveGoalEditor = saveGoalEditor;
+
+// 외부 클릭 시 팝업 닫기
+document.addEventListener('click', e=>{
+  const popup=document.getElementById('goalEditorPopup');
+  const badge=document.getElementById('goalBadge');
+  if(popup&&!popup.contains(e.target)&&badge&&!badge.contains(e.target)){
+    popup.classList.remove('open');
+  }
+});
+
+// 뒤로가기
+document.getElementById('profileBackBtn').addEventListener('click',()=>{
+  document.getElementById('profileNavTab').style.display='none';
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.nav-tab[data-page="ranking"]').classList.add('active');
+  document.getElementById('page-ranking').classList.add('active');
+  document.getElementById('fabBtn').classList.remove('hidden');
+  currentPage='ranking';
+  renderRankingPage();
+});
 
 window.deleteLog    = deleteLog;
 window.deleteMember = deleteMember;
