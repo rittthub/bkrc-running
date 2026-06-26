@@ -675,7 +675,25 @@ function closeRegModal(){document.getElementById('regModalBg').classList.remove(
 document.getElementById('inputPhoto').addEventListener('change',function(){
   const file=this.files[0];if(!file)return;
   const r=new FileReader();
-  r.onload=e=>{photoDataUrl=e.target.result;const area=document.getElementById('photoArea');let img=area.querySelector('img');if(!img){img=document.createElement('img');area.appendChild(img)}img.src=photoDataUrl;area.querySelector('.photo-upload-label').textContent='탭하여 변경'};
+  r.onload=e=>{
+    const rawDataUrl=e.target.result;
+    // 압축: 최대 1200px, quality 0.75
+    const tmpImg=new Image();
+    tmpImg.onload=()=>{
+      const MAX=1200;
+      let w=tmpImg.width, h=tmpImg.height;
+      if(w>MAX||h>MAX){const ratio=Math.min(MAX/w,MAX/h);w=Math.round(w*ratio);h=Math.round(h*ratio);}
+      const cvs=document.createElement('canvas');cvs.width=w;cvs.height=h;
+      cvs.getContext('2d').drawImage(tmpImg,0,0,w,h);
+      photoDataUrl=cvs.toDataURL('image/jpeg',0.75);
+      const area=document.getElementById('photoArea');
+      let img=area.querySelector('img');
+      if(!img){img=document.createElement('img');area.appendChild(img)}
+      img.src=photoDataUrl;
+      area.querySelector('.photo-upload-label').textContent='탭하여 변경';
+    };
+    tmpImg.src=rawDataUrl;
+  };
   r.readAsDataURL(file);
 });
 function clearPhoto(){photoDataUrl=null;const area=document.getElementById('photoArea');const img=area.querySelector('img');if(img)img.remove();area.querySelector('.photo-upload-label').textContent='사진을 탭하여 업로드';document.getElementById('inputPhoto').value=''}
@@ -687,10 +705,16 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
   if(!name){showToast('회원을 선택해 주세요');return}
   if(!date){showToast('날짜를 선택해 주세요');return}
   if(!km||km<=0){showToast('거리를 입력해 주세요');return}
-  const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,memo,photo:photoDataUrl||null,createdAt:Date.now()};
-  await saveLog(log);
-  feedMonth=getMonthKey(date);clearPhoto();closeRegModal();
-  showToast(`✅ ${name} · ${km}km 인증 완료!`);
+  const btn=document.getElementById('btnSubmit');
+  btn.disabled=true;btn.textContent='저장 중...';
+  try{
+    const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,memo,photo:photoDataUrl||null,createdAt:Date.now()};
+    await saveLog(log);
+    feedMonth=getMonthKey(date);clearPhoto();closeRegModal();
+    showToast(`✅ ${name} · ${km}km 인증 완료!`);
+  }finally{
+    btn.disabled=false;btn.textContent='인증 등록';
+  }
 });
 
 // ══════════════════════════════════
