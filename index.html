@@ -523,7 +523,10 @@ function podiumHTML(ranked, colorClass, barClass, themeClass){
   const top3=ranked.slice(0,3);
   return order.map(i=>{
     const r=top3[i];
-    if(!r)return`<div class="podium-card ${pcls[i]}"></div>`;
+    if(!r)return`<div class="podium-card ${pcls[i]}">
+      <div class="podium-medal" style="opacity:.25">${medals[i]}</div>
+      <div class="podium-name" style="color:var(--muted);font-size:11px">기록 없음</div>
+    </div>`;
     return`<div class="podium-card ${pcls[i]}${i===0?' '+themeClass:''}">
       <div class="podium-medal">${medals[i]}</div>
       <div class="podium-name">${esc(r.name)}</div>
@@ -552,13 +555,11 @@ function renderRankContent(){
   const el=document.getElementById('rankContent');
   if(rankGender==='male'){
     const ranked=buildRanked('male');
-    if(!ranked.length){el.innerHTML=`<div class="zero-rank" style="color:var(--male)">남자반 기록이 없어요.</div>`;return}
     el.innerHTML=`
       <div class="rank-podium">${podiumHTML(ranked,'male-c','male-bar','male-theme')}</div>
       <div class="rank-list">${rankListHTML(ranked,'male-c','male-bar',4)}</div>`;
   } else {
     const ranked=buildRanked('female');
-    if(!ranked.length){el.innerHTML=`<div class="zero-rank" style="color:var(--female)">여자반 기록이 없어요.</div>`;return}
     el.innerHTML=`
       <div class="rank-podium">${podiumHTML(ranked,'female-c','female-bar','female-theme')}</div>
       <div class="rank-list">${rankListHTML(ranked,'female-c','female-bar',4)}</div>`;
