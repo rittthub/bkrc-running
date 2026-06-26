@@ -302,6 +302,14 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
         </div>
       </div>
 
+      <!-- 🏆 시상자료 다운로드 -->
+      <div style="margin-bottom:16px">
+        <button class="photo-mgmt-btn" id="btnDownloadStats" style="width:100%;background:var(--card);border:1px solid rgba(200,240,0,.35);color:var(--lime)">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          📊 이달 통계 CSV 다운로드
+        </button>
+      </div>
+
       <div class="admin-logs-table" id="adminLogTable"></div>
     </div>
   </div>
@@ -869,6 +877,45 @@ async function downloadCollage(){
   }
 }
 document.getElementById('btnCollage').addEventListener('click', downloadCollage);
+
+// ══════════════════════════════════
+//  STATISTICS CSV DOWNLOAD
+// ══════════════════════════════════
+function downloadStatsCSV(){
+  const ml=logs.filter(l=>getMonthKey(l.date)===adminMonth);
+  if(!ml.length){showToast('이달 기록이 없습니다');return}
+
+  // Build stats: name, gender, count, total km
+  const map={};
+  ml.forEach(l=>{
+    if(!map[l.name])map[l.name]={cnt:0,km:0,gender:getMemberGender(l.name)};
+    map[l.name].cnt+=1;
+    map[l.name].km+=parseFloat(l.km||0);
+  });
+
+  const sorted=Object.entries(map)
+    .map(([name,v])=>({name,...v}))
+    .sort((a,b)=>b.km-a.km||b.cnt-a.cnt);
+
+  // CSV header
+  let csv='이름,성별,인증횟수,총거리(km)\n';
+  
+  // CSV rows
+  sorted.forEach(s=>{
+    const gender=s.gender==='m'?'남':'여';
+    const line=`${s.name},${gender},${s.cnt},${s.km.toFixed(1)}`;
+    csv+=line+'\n';
+  });
+
+  // Download
+  const bom='\uFEFF'; // UTF-8 BOM for Excel
+  const link=document.createElement('a');
+  link.href='data:text/csv;charset=utf-8,'+encodeURIComponent(bom+csv);
+  link.download=`BKRC_${adminMonth}_통계.csv`;
+  link.click();
+  showToast(`📊 ${sorted.length}명 데이터 다운로드 완료`);
+}
+document.getElementById('btnDownloadStats').addEventListener('click', downloadStatsCSV);
 
 window.deleteLog    = deleteLog;
 window.deleteMember = deleteMember;
