@@ -505,6 +505,8 @@ function buildRanked(genderFilter){
     return getMemberGender(l.name)===(genderFilter==='male'?'m':'f');
   });
   const map={};
+  members.filter(m=>genderFilter==='all'||m.gender===(genderFilter==='male'?'m':'f'))
+    .forEach(m=>{map[m.name]={km:0,cnt:0,gender:m.gender}});
   ml.forEach(l=>{
     if(!map[l.name])map[l.name]={km:0,cnt:0,gender:getMemberGender(l.name)};
     map[l.name].km+=parseFloat(l.km||0);
