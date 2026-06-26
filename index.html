@@ -325,25 +325,58 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+// ══════════════════════════════════
+//  FIREBASE INIT
+// ══════════════════════════════════
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import { getFirestore, collection, doc, getDocs, addDoc, deleteDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBdxKw_nrFmGV5D-KOpWTVPksSpkktnvVw",
+  authDomain: "bkrc-978e4.firebaseapp.com",
+  projectId: "bkrc-978e4",
+  storageBucket: "bkrc-978e4.firebasestorage.app",
+  messagingSenderId: "676708080893",
+  appId: "1:676708080893:web:e74c1f3332e8b6f1bab294"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 // ══════════════════════════════════
 //  DATA
 // ══════════════════════════════════
 const GOAL_KM = 100;
 const ADMIN_PW = 'bkrc2026';
 
-function loadData(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
-function saveData(k,v){localStorage.setItem(k,JSON.stringify(v))}
-
-// members: [{name, gender:'m'|'f'}]
-let logs    = loadData('bkrc_logs2', []);
-let members = loadData('bkrc_members2', [
-  {name:'김민준',gender:'m'},{name:'이서준',gender:'m'},{name:'박지훈',gender:'m'},
-  {name:'최준혁',gender:'m'},{name:'정도윤',gender:'m'},
-  {name:'이지은',gender:'f'},{name:'박서연',gender:'f'},{name:'김수아',gender:'f'},
-  {name:'최유나',gender:'f'},{name:'정하린',gender:'f'}
-]);
+let logs    = [];
+let members = [];
 let adminUnlocked = false;
+
+// Firestore 실시간 리스너
+onSnapshot(collection(db,'logs'), snap=>{
+  logs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAll();
+});
+onSnapshot(collection(db,'members'), snap=>{
+  members=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAll();
+});
+
+async function saveLog(log){
+  const {id,...data}=log;
+  await setDoc(doc(db,'logs',id),data);
+}
+async function saveMember(m){
+  await addDoc(collection(db,'members'),{name:m.name,gender:m.gender});
+}
+async function removeLog(id){
+  await deleteDoc(doc(db,'logs',id));
+}
+async function removeMember(name){
+  const snap=await getDocs(collection(db,'members'));
+  snap.docs.filter(d=>d.data().name===name).forEach(d=>deleteDoc(doc(db,'members',d.id)));
+}
 
 // ══════════════════════════════════
 //  HELPERS
@@ -553,23 +586,23 @@ function renderAdminPage(){
 // ══════════════════════════════════
 //  ACTIONS
 // ══════════════════════════════════
-function deleteLog(id){
+async function deleteLog(id){
   if(!confirm('이 기록을 삭제할까요?'))return;
-  logs=logs.filter(l=>l.id!==id);saveData('bkrc_logs2',logs);renderAll();
+  await removeLog(id);
 }
-function deleteMember(name){
+async function deleteMember(name){
   if(!confirm(`'${name}' 회원을 삭제할까요?`))return;
-  members=members.filter(m=>m.name!==name);saveData('bkrc_members2',members);
-  renderAdminPage();showToast('회원 삭제 완료');
+  await removeMember(name);
+  showToast('회원 삭제 완료');
 }
-document.getElementById('addMemberBtn').addEventListener('click',()=>{
+document.getElementById('addMemberBtn').addEventListener('click',async()=>{
   const name=document.getElementById('newMemberInput').value.trim();
   const gender=document.getElementById('newMemberGender').value;
   if(!name)return;
   if(members.find(m=>m.name===name)){showToast('이미 등록된 회원입니다');return}
-  members.push({name,gender});saveData('bkrc_members2',members);
+  await saveMember({name,gender});
   document.getElementById('newMemberInput').value='';
-  renderAdminPage();showToast(`'${name}' (${gender==='m'?'남':'여'}) 등록 완료! 🎉`);
+  showToast(`'${name}' (${gender==='m'?'남':'여'}) 등록 완료! 🎉`);
 });
 document.getElementById('newMemberInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('addMemberBtn').click()});
 
@@ -613,7 +646,7 @@ document.getElementById('inputPhoto').addEventListener('change',function(){
   r.readAsDataURL(file);
 });
 function clearPhoto(){photoDataUrl=null;const area=document.getElementById('photoArea');const img=area.querySelector('img');if(img)img.remove();area.querySelector('.photo-upload-label').textContent='사진을 탭하여 업로드';document.getElementById('inputPhoto').value=''}
-document.getElementById('btnSubmit').addEventListener('click',()=>{
+document.getElementById('btnSubmit').addEventListener('click',async()=>{
   const name=document.getElementById('inputName').value;
   const date=document.getElementById('inputDate').value;
   const km=parseFloat(document.getElementById('inputKm').value);
@@ -622,8 +655,8 @@ document.getElementById('btnSubmit').addEventListener('click',()=>{
   if(!date){showToast('날짜를 선택해 주세요');return}
   if(!km||km<=0){showToast('거리를 입력해 주세요');return}
   const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,memo,photo:photoDataUrl||null,createdAt:Date.now()};
-  logs.push(log);saveData('bkrc_logs2',logs);
-  feedMonth=getMonthKey(date);clearPhoto();closeRegModal();renderAll();
+  await saveLog(log);
+  feedMonth=getMonthKey(date);clearPhoto();closeRegModal();
   showToast(`✅ ${name} · ${km}km 인증 완료!`);
 });
 
@@ -651,6 +684,13 @@ function switchToAdmin(){
   document.getElementById('fabBtn').classList.add('hidden');
   currentPage='admin';renderAdminPage();
 }
+
+// ══════════════════════════════════
+//  GLOBAL EXPOSE (module scope → onclick)
+// ══════════════════════════════════
+window.deleteLog    = deleteLog;
+window.deleteMember = deleteMember;
+window.setGender    = setGender;
 
 // ══════════════════════════════════
 //  RENDER ALL
