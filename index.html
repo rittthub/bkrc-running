@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BKRC — 부경러닝크루</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0D1B2A; --card:#1A2B3C; --card2:#142030;
+  --lime:#C8F000; --lime-glow:rgba(200,240,0,.28);
+  --text:#E8EDF2; --muted:#6A7F96;
+  --border:rgba(200,240,0,.15); --border2:rgba(255,255,255,.07);
+  --danger:#FF5A5A;
+  --male:#4FC3F7;   --male-glow:rgba(79,195,247,.25);   --male-dim:rgba(79,195,247,.1);
+  --female:#F48FB1; --female-glow:rgba(244,143,177,.25); --female-dim:rgba(244,143,177,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.logo-wrap{display:flex;align-items:baseline;gap:10px}
+.logo-bkrc{font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;letter-spacing:4px;color:var(--lime);text-shadow:0 0 18px var(--lime-glow)}
+.logo-sub{font-size:11px;color:var(--muted);letter-spacing:1px}
+.admin-btn{background:none;border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--muted);font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s;font-family:'Noto Sans KR',sans-serif}
+.admin-btn:hover{border-color:var(--border);color:var(--text)}
+
+/* NAV */
+.nav-tabs{display:flex;background:rgba(10,18,28,.6);border-bottom:1px solid var(--border2);padding:0 20px}
+.nav-tab{flex:1;padding:12px 0;text-align:center;font-size:12px;letter-spacing:2px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-weight:500;text-transform:uppercase}
+.nav-tab.active{color:var(--lime);border-bottom-color:var(--lime)}
+
+/* PAGE */
+.page{display:none}.page.active{display:block}
+
+/* MONTH TABS */
+.month-tabs{padding:14px 20px 4px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.month-tabs::-webkit-scrollbar{display:none}
+.month-tab{flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted);transition:all .2s;letter-spacing:1px}
+.month-tab.active{background:var(--lime);color:#0D1B2A;border-color:transparent;font-weight:700}
+
+/* STATS */
+.dashboard{padding:20px 20px 16px;background:linear-gradient(160deg,#0f2236 0%,var(--bg) 70%)}
+.dash-title{font-size:10px;letter-spacing:3px;color:var(--lime);text-transform:uppercase;margin-bottom:14px;font-weight:500}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:14px 12px;text-align:center;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--lime);opacity:.4}
+.stat-card.main::before{opacity:1}.stat-card.main{border-color:rgba(200,240,0,.3)}
+.stat-value{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:var(--lime);line-height:1;margin-bottom:3px}
+.stat-card.main .stat-value{font-size:36px}
+.stat-unit{font-family:'Oswald',sans-serif;font-size:11px;color:var(--lime);opacity:.7}
+.stat-label{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:1px}
+.progress-wrap{background:var(--card);border-radius:10px;padding:12px 16px;border:1px solid var(--border2)}
+.progress-header{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:1px}
+.progress-bar-bg{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#C8F000,#a8d000);border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px var(--lime-glow)}
+
+/* SECTION HEAD */
+.section-head{padding:18px 20px 10px;display:flex;justify-content:space-between;align-items:center}
+.section-title{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:2px;color:var(--text)}
+.section-badge{font-size:11px;color:var(--muted);background:var(--card);padding:3px 10px;border-radius:20px;border:1px solid var(--border2)}
+
+/* LOG FEED */
+.feed{padding:0 20px 100px;display:flex;flex-direction:column;gap:10px}
+.log-card{background:var(--card);border:1px solid var(--border2);border-radius:14px;overflow:hidden;animation:slideIn .35s ease both}
+@keyframes slideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.log-photo{width:100%;height:170px;object-fit:cover;display:block}
+.log-photo-placeholder{width:100%;height:90px;background:linear-gradient(135deg,#152030,#0f1c28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:11px}
+.log-body{padding:12px 14px}
+.log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.log-name{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
+.log-date{font-size:11px;color:var(--muted);margin-top:2px}
+.log-km{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;color:var(--lime);line-height:1;text-shadow:0 0 10px var(--lime-glow)}
+.log-km span{font-size:13px;font-family:'Noto Sans KR',sans-serif;opacity:.8}
+.log-memo{font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border2);padding-top:8px;margin-top:4px}
+.log-actions{display:flex;align-items:center;gap:8px}
+.log-delete{background:none;border:none;color:rgba(255,255,255,.15);cursor:pointer;padding:4px;transition:color .2s;display:flex;align-items:center}
+.log-delete:hover{color:var(--danger)}
+
+/* GENDER BADGE */
+.gender-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:1px;flex-shrink:0}
+.gb-m{background:var(--male-dim);color:var(--male);border:1px solid rgba(79,195,247,.25)}
+.gb-f{background:var(--female-dim);color:var(--female);border:1px solid rgba(244,143,177,.25)}
+
+/* ══ RANKING PAGE ══ */
+.ranking-wrap{padding:0 20px 100px}
+
+/* Rank gender tabs */
+.rank-gender-tabs{display:flex;border-bottom:2px solid var(--border2)}
+.rank-gender-tab{flex:1;padding:13px 0;text-align:center;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .22s;font-family:'Noto Sans KR',sans-serif}
+.rank-gender-tab.male-tab.active{color:var(--male);border-bottom-color:var(--male);background:linear-gradient(180deg,var(--male-dim) 0%,transparent 100%)}
+.rank-gender-tab.female-tab.active{color:var(--female);border-bottom-color:var(--female);background:linear-gradient(180deg,var(--female-dim) 0%,transparent 100%)}
+
+/* Podium */
+.rank-podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px;margin-bottom:20px;align-items:flex-end}
+.podium-card{background:var(--card);border-radius:14px;padding:14px 10px 16px;text-align:center;border:1px solid var(--border2);position:relative;overflow:hidden}
+.podium-card.p1{border-color:rgba(255,209,102,.35);background:linear-gradient(180deg,#1e2a10 0%,var(--card) 60%)}
+.podium-card.p1.male-theme{border-color:rgba(79,195,247,.4);background:linear-gradient(180deg,#0e2230 0%,var(--card) 60%)}
+.podium-card.p1.female-theme{border-color:rgba(244,143,177,.4);background:linear-gradient(180deg,#261828 0%,var(--card) 60%)}
+.podium-medal{font-size:22px;margin-bottom:6px}
+.podium-name{font-size:12px;font-weight:700;margin-bottom:4px}
+.podium-km{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;line-height:1.1}
+.podium-km.male-c{color:var(--male)}
+.podium-km.female-c{color:var(--female)}
+.podium-km.all-c{color:var(--lime)}
+.podium-km span{font-size:11px;font-family:'Noto Sans KR',sans-serif;opacity:.7}
+.podium-count{font-size:10px;color:var(--muted);margin-top:2px}
+.podium-gbadge{font-size:9px;margin-top:4px}
+
+/* Rank list */
+.rank-list{display:flex;flex-direction:column;gap:8px}
+.rank-row{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.rank-num{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:var(--muted);width:26px;text-align:center;flex-shrink:0}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px}
+.rank-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.rank-bar-wrap{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:6px;overflow:hidden}
+.rank-bar{height:100%;border-radius:2px;transition:width 1s .15s cubic-bezier(.4,0,.2,1)}
+.rank-bar.male-bar{background:var(--male)}
+.rank-bar.female-bar{background:var(--female)}
+.rank-bar.all-bar{background:var(--lime)}
+.rank-km{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;flex-shrink:0}
+.rank-km.male-c{color:var(--male)}
+.rank-km.female-c{color:var(--female)}
+.rank-km.all-c{color:var(--lime)}
+.rank-km span{font-size:11px;font-family:'Noto Sans KR',sans-serif;opacity:.7}
+.zero-rank{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+
+/* Split view (남/여 side by side header) */
+.split-header{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.split-title{text-align:center;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 0;border-radius:10px;font-weight:700}
+.split-title.male{color:var(--male);background:var(--male-dim);border:1px solid rgba(79,195,247,.2)}
+.split-title.female{color:var(--female);background:var(--female-dim);border:1px solid rgba(244,143,177,.2)}
+
+/* ADMIN */
+.admin-wrap{padding:16px 20px 100px}
+.admin-section{margin-bottom:24px}
+.admin-section-title{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2px;color:var(--lime);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.member-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.member-chip{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:4px}
+.member-chip.chip-m{border-left:3px solid var(--male)}
+.member-chip.chip-f{border-left:3px solid var(--female)}
+.member-chip-name{font-size:13px;font-weight:500}
+.member-chip-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.chip-del{background:none;border:none;color:rgba(255,255,255,.15);cursor:pointer;padding:4px;transition:color .2s;flex-shrink:0}
+.chip-del:hover{color:var(--danger)}
+.add-member-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
+.add-member-row .form-input{margin:0}
+.gender-select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 10px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;outline:none;cursor:pointer;-webkit-appearance:none}
+.gender-select option{background:#1A2B3C}
+.add-member-btn{background:var(--lime);color:#0D1B2A;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:opacity .2s;font-family:'Noto Sans KR',sans-serif}
+.add-member-btn:hover{opacity:.85}
+.admin-logs-table{display:flex;flex-direction:column;gap:6px}
+.admin-log-row{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.admin-log-info{flex:1;min-width:0}
+.admin-log-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.admin-log-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.admin-log-km{font-family:'Oswald',sans-serif;font-size:18px;color:var(--lime);flex-shrink:0}
+.admin-log-km span{font-size:11px;font-family:'Noto Sans KR',sans-serif;opacity:.7}
+
+/* FAB */
+.fab{position:fixed;bottom:26px;right:22px;width:58px;height:58px;background:var(--lime);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px var(--lime-glow),0 2px 8px rgba(0,0,0,.4);transition:transform .2s;z-index:200}
+.fab:hover{transform:scale(1.08)}.fab:active{transform:scale(.96)}.fab svg{color:#0D1B2A}.fab.hidden{display:none}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(5,13,22,.9);backdrop-filter:blur(6px);z-index:300;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--card2);border:1px solid var(--border);border-radius:22px 22px 0 0;padding:24px 22px 40px;width:100%;max-width:480px;transform:translateY(40px);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:2px;color:var(--lime);margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:5px;display:block;text-transform:uppercase}
+.form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.form-input:focus{border-color:rgba(200,240,0,.5);background:rgba(200,240,0,.03)}
+.form-input option{background:#1A2B3C;color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.photo-upload-area{width:100%;height:110px;background:rgba(255,255,255,.04);border:2px dashed rgba(200,240,0,.2);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.photo-upload-area:hover{border-color:rgba(200,240,0,.4);background:rgba(200,240,0,.03)}
+.photo-upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo-upload-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo-upload-label{font-size:11px;color:var(--muted);pointer-events:none;z-index:1}
+.photo-upload-icon{color:var(--lime);opacity:.6;pointer-events:none;z-index:1}
+.btn-submit{width:100%;padding:14px;background:var(--lime);color:#0D1B2A;border:none;border-radius:12px;font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:3px;cursor:pointer;margin-top:6px;transition:opacity .2s,transform .1s}
+.btn-submit:active{transform:scale(.98);opacity:.9}
+.admin-login-desc{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+
+/* TOAST */
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--lime);color:#0D1B2A;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:700;letter-spacing:1px;opacity:0;pointer-events:none;transition:all .3s;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty-state{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-state p{font-size:13px;line-height:1.7;margin-top:12px}
+
+@media(max-width:380px){.stat-value{font-size:22px}.rank-podium{gap:5px}.podium-km{font-size:18px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-bkrc">BKRC</div>
+    <div class="logo-sub">부경러닝크루</div>
+  </div>
+  <button class="admin-btn" id="adminAccessBtn">⚙ 관리자</button>
+</header>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" data-page="feed">피드</div>
+  <div class="nav-tab" data-page="ranking">랭킹</div>
+</div>
+
+<!-- ══ FEED ══ -->
+<div class="page active" id="page-feed">
+  <div class="month-tabs" id="monthTabs"></div>
+  <div class="dashboard">
+    <div class="dash-title">MONTHLY STATS</div>
+    <div class="stats-row">
+      <div class="stat-card main"><div class="stat-value" id="statKm">0.0</div><div class="stat-unit">km</div><div class="stat-label">월간 총 거리</div></div>
+      <div class="stat-card"><div class="stat-value" id="statCount">0</div><div class="stat-unit">회</div><div class="stat-label">인증 횟수</div></div>
+      <div class="stat-card"><div class="stat-value" id="statAvg">0.0</div><div class="stat-unit">km</div><div class="stat-label">회당 평균</div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-header"><span>월간 목표 달성률</span><span id="progressLabel">0 / 100 km</span></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="section-head">
+    <div class="section-title">RUNNING LOG</div>
+    <div class="section-badge" id="logCount">0건</div>
+  </div>
+  <div class="feed" id="feed"></div>
+</div>
+
+<!-- ══ RANKING ══ -->
+<div class="page" id="page-ranking">
+  <div class="month-tabs" id="rankMonthTabs"></div>
+  <!-- Gender Tabs -->
+  <div class="rank-gender-tabs">
+    <div class="rank-gender-tab male-tab active" id="tabMale" onclick="setGender('male')">🔵 남자반</div>
+    <div class="rank-gender-tab female-tab" id="tabFemale" onclick="setGender('female')">🩷 여자반</div>
+  </div>
+  <div class="ranking-wrap">
+    <div id="rankContent"></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN ══ -->
+<div class="page" id="page-admin">
+  <div class="admin-wrap">
+    <div class="admin-section">
+      <div class="admin-section-title">👥 회원 목록</div>
+      <div class="member-grid" id="memberGrid"></div>
+      <div class="add-member-row" style="margin-top:10px">
+        <input class="form-input" id="newMemberInput" type="text" placeholder="새 회원 이름">
+        <select class="gender-select" id="newMemberGender">
+          <option value="m">남</option>
+          <option value="f">여</option>
+        </select>
+        <button class="add-member-btn" id="addMemberBtn">추가</button>
+      </div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>📋 전체 인증 기록</span>
+        <div class="month-tabs" style="padding:0;overflow-x:auto" id="adminMonthTabs"></div>
+      </div>
+      <div class="admin-logs-table" id="adminLogTable"></div>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="fabBtn">
+  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+</button>
+
+<!-- MODAL: 인증 -->
+<div class="modal-bg" id="regModalBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏃 러닝 인증</div>
+    <div class="form-group">
+      <label class="form-label">회원 선택</label>
+      <select class="form-input" id="inputName"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">날짜</label><input class="form-input" id="inputDate" type="date"></div>
+      <div class="form-group"><label class="form-label">거리 (km)</label><input class="form-input" id="inputKm" type="number" placeholder="0.0" step="0.1" min="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">메모 (선택)</label><input class="form-input" id="inputMemo" type="text" placeholder="오늘 러닝 한마디!"></div>
+    <div class="form-group">
+      <label class="form-label">인증 사진</label>
+      <div class="photo-upload-area" id="photoArea">
+        <svg class="photo-upload-icon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        <div class="photo-upload-label">사진을 탭하여 업로드</div>
+        <input type="file" accept="image/*" id="inputPhoto" capture="environment">
+      </div>
+    </div>
+    <button class="btn-submit" id="btnSubmit">인증 등록</button>
+  </div>
+</div>
+
+<!-- MODAL: 관리자 -->
+<div class="modal-bg" id="adminModalBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔐 관리자 로그인</div>
+    <div class="admin-login-desc">관리자 비밀번호를 입력하세요.<br><span style="font-size:11px;opacity:.5">기본 비밀번호: bkrc2024</span></div>
+    <div class="form-group"><label class="form-label">비밀번호</label><input class="form-input" id="adminPwInput" type="password" placeholder="비밀번호 입력"></div>
+    <button class="btn-submit" id="adminLoginBtn">확인</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+//  DATA
+// ══════════════════════════════════
+const GOAL_KM = 100;
+const ADMIN_PW = 'bkrc2024';
+
+function loadData(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
+function saveData(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+// members: [{name, gender:'m'|'f'}]
+let logs    = loadData('bkrc_logs2', []);
+let members = loadData('bkrc_members2', [
+  {name:'김민준',gender:'m'},{name:'이서준',gender:'m'},{name:'박지훈',gender:'m'},
+  {name:'최준혁',gender:'m'},{name:'정도윤',gender:'m'},
+  {name:'이지은',gender:'f'},{name:'박서연',gender:'f'},{name:'김수아',gender:'f'},
+  {name:'최유나',gender:'f'},{name:'정하린',gender:'f'}
+]);
+let adminUnlocked = false;
+
+// ══════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function getMonthKey(d){const dt=new Date(d);return`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`}
+function formatMonthLabel(k){const[y,m]=k.split('-');return`${y}년 ${parseInt(m)}월`}
+function todayStr(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function thisMonthKey(){return getMonthKey(todayStr())}
+function getAvailableMonths(){const s=new Set([thisMonthKey()]);logs.forEach(l=>s.add(getMonthKey(l.date)));return Array.from(s).sort().reverse()}
+function getMemberGender(name){return(members.find(m=>m.name===name)||{}).gender||'m'}
+function genderLabel(g){return g==='m'?'남':'여'}
+
+function animateNum(el,target,dec=0){
+  const start=parseFloat(el.textContent)||0,dur=550,t0=performance.now();
+  (function step(now){const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);
+  el.textContent=(start+(target-start)*e).toFixed(dec);
+  if(p<1)requestAnimationFrame(step);else el.textContent=target.toFixed(dec)})(t0)
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+
+// ══════════════════════════════════
+//  STATE
+// ══════════════════════════════════
+let feedMonth  = thisMonthKey();
+let rankMonth  = thisMonthKey();
+let adminMonth = thisMonthKey();
+let rankGender = 'male'; // 'male' | 'female'
+let currentPage = 'feed';
+
+// ══════════════════════════════════
+//  MONTH TABS
+// ══════════════════════════════════
+function renderMonthTabs(id, active, cb){
+  const months=getAvailableMonths();
+  if(!months.includes(active))active=months[0];
+  document.getElementById(id).innerHTML=months.map(m=>
+    `<button class="month-tab ${m===active?'active':''}" onclick="(${cb.toString()})('${m}')">${formatMonthLabel(m)}</button>`
+  ).join('');
+  return active;
+}
+
+// ══════════════════════════════════
+//  FEED PAGE
+// ══════════════════════════════════
+function renderFeedPage(){
+  feedMonth=renderMonthTabs('monthTabs',feedMonth,m=>{feedMonth=m;renderFeedPage()});
+  const ml=logs.filter(l=>getMonthKey(l.date)===feedMonth);
+  const total=ml.reduce((s,l)=>s+parseFloat(l.km||0),0),cnt=ml.length;
+  animateNum(document.getElementById('statKm'),total,1);
+  animateNum(document.getElementById('statCount'),cnt,0);
+  animateNum(document.getElementById('statAvg'),cnt?total/cnt:0,1);
+  document.getElementById('progressFill').style.width=Math.min((total/GOAL_KM)*100,100)+'%';
+  document.getElementById('progressLabel').textContent=`${total.toFixed(1)} / ${GOAL_KM} km`;
+  document.getElementById('logCount').textContent=cnt+'건';
+
+  const sorted=ml.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const feed=document.getElementById('feed');
+  if(!sorted.length){
+    feed.innerHTML=`<div class="empty-state"><svg width="48" height="48" fill="none" stroke="#6A7F96" stroke-width="1.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg><p>이번 달 인증 기록이 없어요.<br>+ 버튼을 눌러 첫 러닝을 인증해 보세요!</p></div>`;
+    return;
+  }
+  feed.innerHTML=sorted.map((log,i)=>{
+    const d=new Date(log.date);
+    const ds=`${d.getMonth()+1}월 ${d.getDate()}일 (${['일','월','화','수','목','금','토'][d.getDay()]})`;
+    const g=getMemberGender(log.name);
+    const ph=log.photo?`<img class="log-photo" src="${log.photo}" alt="인증 사진">`:`<div class="log-photo-placeholder"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg><span>사진 없음</span></div>`;
+    return`<div class="log-card" style="animation-delay:${i*.04}s">${ph}
+      <div class="log-body">
+        <div class="log-top">
+          <div>
+            <div class="log-name">${esc(log.name)}<span class="gender-badge ${g==='m'?'gb-m':'gb-f'}">${g==='m'?'남':'여'}</span></div>
+            <div class="log-date">${ds}</div>
+          </div>
+          <div class="log-actions">
+            <div class="log-km">${parseFloat(log.km).toFixed(1)}<span>km</span></div>
+            <button class="log-delete" onclick="deleteLog('${log.id}')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6M10,11v6M14,11v6M9,6V4h6v2"/></svg></button>
+          </div>
+        </div>
+        ${log.memo?`<div class="log-memo">${esc(log.memo)}</div>`:''}
+      </div></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════
+//  RANKING PAGE
+// ══════════════════════════════════
+function setGender(g){
+  rankGender=g;
+  document.getElementById('tabMale').classList.toggle('active',g==='male');
+  document.getElementById('tabFemale').classList.toggle('active',g==='female');
+  renderRankContent();
+}
+
+function buildRanked(genderFilter){
+  const ml=logs.filter(l=>{
+    if(getMonthKey(l.date)!==rankMonth)return false;
+    if(genderFilter==='all')return true;
+    return getMemberGender(l.name)===(genderFilter==='male'?'m':'f');
+  });
+  const map={};
+  members.filter(m=>genderFilter==='all'||m.gender===(genderFilter==='male'?'m':'f'))
+    .forEach(m=>{map[m.name]={km:0,cnt:0,gender:m.gender}});
+  ml.forEach(l=>{
+    if(!map[l.name])map[l.name]={km:0,cnt:0,gender:getMemberGender(l.name)};
+    map[l.name].km+=parseFloat(l.km||0);
+    map[l.name].cnt+=1;
+  });
+  return Object.entries(map).map(([name,v])=>({name,...v}))
+    .sort((a,b)=>b.km-a.km||b.cnt-a.cnt);
+}
+
+function podiumHTML(ranked, colorClass, barClass, themeClass){
+  const medals=['🥇','🥈','🥉'];
+  const pcls=['p1','p2','p3'];
+  const order=[1,0,2];
+  const top3=ranked.slice(0,3);
+  return order.map(i=>{
+    const r=top3[i];
+    if(!r)return`<div class="podium-card ${pcls[i]}"></div>`;
+    return`<div class="podium-card ${pcls[i]}${i===0?' '+themeClass:''}">
+      <div class="podium-medal">${medals[i]}</div>
+      <div class="podium-name">${esc(r.name)}</div>
+      <div class="podium-km ${colorClass}">${r.km.toFixed(1)}<span>km</span></div>
+      <div class="podium-count">${r.cnt}회 인증</div>
+    </div>`;
+  }).join('');
+}
+
+function rankListHTML(ranked, colorClass, barClass, startIdx=4){
+  const maxKm=ranked[0]?.km||1;
+  return ranked.slice(startIdx-1).map((r,i)=>
+    `<div class="rank-row">
+      <div class="rank-num">${i+startIdx}</div>
+      <div class="rank-info">
+        <div class="rank-name">${esc(r.name)}</div>
+        <div class="rank-sub">${r.cnt}회 인증</div>
+        <div class="rank-bar-wrap"><div class="rank-bar ${barClass}" style="width:${(r.km/maxKm*100).toFixed(1)}%"></div></div>
+      </div>
+      <div class="rank-km ${colorClass}">${r.km.toFixed(1)}<span>km</span></div>
+    </div>`
+  ).join('');
+}
+
+function renderRankContent(){
+  const el=document.getElementById('rankContent');
+  if(rankGender==='male'){
+    const ranked=buildRanked('male');
+    if(!ranked.length){el.innerHTML=`<div class="zero-rank" style="color:var(--male)">남자반 기록이 없어요.</div>`;return}
+    el.innerHTML=`
+      <div class="rank-podium">${podiumHTML(ranked,'male-c','male-bar','male-theme')}</div>
+      <div class="rank-list">${rankListHTML(ranked,'male-c','male-bar',4)}</div>`;
+  } else {
+    const ranked=buildRanked('female');
+    if(!ranked.length){el.innerHTML=`<div class="zero-rank" style="color:var(--female)">여자반 기록이 없어요.</div>`;return}
+    el.innerHTML=`
+      <div class="rank-podium">${podiumHTML(ranked,'female-c','female-bar','female-theme')}</div>
+      <div class="rank-list">${rankListHTML(ranked,'female-c','female-bar',4)}</div>`;
+  }
+}
+
+function renderRankingPage(){
+  rankMonth=renderMonthTabs('rankMonthTabs',rankMonth,m=>{rankMonth=m;renderRankingPage()});
+  renderRankContent();
+}
+
+// ══════════════════════════════════
+//  ADMIN PAGE
+// ══════════════════════════════════
+function renderAdminPage(){
+  // Member grid - grouped by gender
+  const males=members.filter(m=>m.gender==='m');
+  const females=members.filter(m=>m.gender==='f');
+  const allSorted=[...males,...females];
+  document.getElementById('memberGrid').innerHTML=allSorted.map(m=>
+    `<div class="member-chip chip-${m.gender}">
+      <div>
+        <div class="member-chip-name">${esc(m.name)}</div>
+        <div class="member-chip-sub"><span class="gender-badge ${m.gender==='m'?'gb-m':'gb-f'}" style="font-size:9px;padding:1px 5px">${m.gender==='m'?'남':'여'}</span> ${logs.filter(l=>l.name===m.name).length}회</div>
+      </div>
+      <button class="chip-del" onclick="deleteMember('${esc(m.name)}')" title="삭제">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`
+  ).join('');
+
+  adminMonth=renderMonthTabs('adminMonthTabs',adminMonth,m=>{adminMonth=m;renderAdminPage()});
+
+  const ml=logs.filter(l=>getMonthKey(l.date)===adminMonth).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('adminLogTable').innerHTML=ml.length
+    ?ml.map(log=>{
+      const d=new Date(log.date);
+      const ds=`${d.getMonth()+1}.${d.getDate()} (${['일','월','화','수','목','금','토'][d.getDay()]})`;
+      const g=getMemberGender(log.name);
+      return`<div class="admin-log-row">
+        <div class="admin-log-info">
+          <div class="admin-log-name">${esc(log.name)}<span class="gender-badge ${g==='m'?'gb-m':'gb-f'}" style="font-size:9px;padding:1px 5px">${g==='m'?'남':'여'}</span></div>
+          <div class="admin-log-sub">${ds}${log.memo?' · '+esc(log.memo):''}</div>
+        </div>
+        <div class="admin-log-km">${parseFloat(log.km).toFixed(1)}<span>km</span></div>
+        <button class="log-delete" onclick="deleteLog('${log.id}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6M10,11v6M14,11v6"/></svg></button>
+      </div>`;
+    }).join('')
+    :`<div class="zero-rank">이달 기록 없음</div>`;
+}
+
+// ══════════════════════════════════
+//  ACTIONS
+// ══════════════════════════════════
+function deleteLog(id){
+  if(!confirm('이 기록을 삭제할까요?'))return;
+  logs=logs.filter(l=>l.id!==id);saveData('bkrc_logs2',logs);renderAll();
+}
+function deleteMember(name){
+  if(!confirm(`'${name}' 회원을 삭제할까요?`))return;
+  members=members.filter(m=>m.name!==name);saveData('bkrc_members2',members);
+  renderAdminPage();showToast('회원 삭제 완료');
+}
+document.getElementById('addMemberBtn').addEventListener('click',()=>{
+  const name=document.getElementById('newMemberInput').value.trim();
+  const gender=document.getElementById('newMemberGender').value;
+  if(!name)return;
+  if(members.find(m=>m.name===name)){showToast('이미 등록된 회원입니다');return}
+  members.push({name,gender});saveData('bkrc_members2',members);
+  document.getElementById('newMemberInput').value='';
+  renderAdminPage();showToast(`'${name}' (${gender==='m'?'남':'여'}) 등록 완료! 🎉`);
+});
+document.getElementById('newMemberInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('addMemberBtn').click()});
+
+// ══════════════════════════════════
+//  NAV
+// ══════════════════════════════════
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const p=tab.dataset.page;
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+    document.getElementById('page-'+p).classList.add('active');
+    document.getElementById('fabBtn').classList.toggle('hidden',p!=='feed');
+    currentPage=p;
+    if(p==='ranking')renderRankingPage();
+  });
+});
+
+// ══════════════════════════════════
+//  MODAL: 인증 등록
+// ══════════════════════════════════
+let photoDataUrl=null;
+document.getElementById('fabBtn').addEventListener('click',()=>{
+  const sel=document.getElementById('inputName');
+  sel.innerHTML=members.length
+    ?members.map(m=>`<option value="${esc(m.name)}">${esc(m.name)} (${m.gender==='m'?'남':'여'})</option>`).join('')
+    :`<option value="">회원 없음</option>`;
+  document.getElementById('inputDate').value=todayStr();
+  document.getElementById('inputKm').value='';
+  document.getElementById('inputMemo').value='';
+  clearPhoto();
+  document.getElementById('regModalBg').classList.add('open');
+});
+document.getElementById('regModalBg').addEventListener('click',e=>{if(e.target===document.getElementById('regModalBg'))closeRegModal()});
+function closeRegModal(){document.getElementById('regModalBg').classList.remove('open')}
+document.getElementById('inputPhoto').addEventListener('change',function(){
+  const file=this.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{photoDataUrl=e.target.result;const area=document.getElementById('photoArea');let img=area.querySelector('img');if(!img){img=document.createElement('img');area.appendChild(img)}img.src=photoDataUrl;area.querySelector('.photo-upload-label').textContent='탭하여 변경'};
+  r.readAsDataURL(file);
+});
+function clearPhoto(){photoDataUrl=null;const area=document.getElementById('photoArea');const img=area.querySelector('img');if(img)img.remove();area.querySelector('.photo-upload-label').textContent='사진을 탭하여 업로드';document.getElementById('inputPhoto').value=''}
+document.getElementById('btnSubmit').addEventListener('click',()=>{
+  const name=document.getElementById('inputName').value;
+  const date=document.getElementById('inputDate').value;
+  const km=parseFloat(document.getElementById('inputKm').value);
+  const memo=document.getElementById('inputMemo').value.trim();
+  if(!name){showToast('회원을 선택해 주세요');return}
+  if(!date){showToast('날짜를 선택해 주세요');return}
+  if(!km||km<=0){showToast('거리를 입력해 주세요');return}
+  const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,memo,photo:photoDataUrl||null,createdAt:Date.now()};
+  logs.push(log);saveData('bkrc_logs2',logs);
+  feedMonth=getMonthKey(date);clearPhoto();closeRegModal();renderAll();
+  showToast(`✅ ${name} · ${km}km 인증 완료!`);
+});
+
+// ══════════════════════════════════
+//  MODAL: 관리자
+// ══════════════════════════════════
+document.getElementById('adminAccessBtn').addEventListener('click',()=>{
+  if(adminUnlocked){switchToAdmin();return}
+  document.getElementById('adminPwInput').value='';
+  document.getElementById('adminModalBg').classList.add('open');
+  setTimeout(()=>document.getElementById('adminPwInput').focus(),400);
+});
+document.getElementById('adminModalBg').addEventListener('click',e=>{if(e.target===document.getElementById('adminModalBg'))document.getElementById('adminModalBg').classList.remove('open')});
+document.getElementById('adminLoginBtn').addEventListener('click',()=>{
+  if(document.getElementById('adminPwInput').value===ADMIN_PW){
+    adminUnlocked=true;document.getElementById('adminModalBg').classList.remove('open');
+    switchToAdmin();showToast('🔓 관리자 모드');
+  }else{showToast('❌ 비밀번호 오류');document.getElementById('adminPwInput').value=''}
+});
+document.getElementById('adminPwInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('adminLoginBtn').click()});
+function switchToAdmin(){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-admin').classList.add('active');
+  document.getElementById('fabBtn').classList.add('hidden');
+  currentPage='admin';renderAdminPage();
+}
+
+// ══════════════════════════════════
+//  RENDER ALL
+// ══════════════════════════════════
+function renderAll(){
+  renderFeedPage();
+  if(currentPage==='ranking')renderRankingPage();
+  if(currentPage==='admin')renderAdminPage();
+}
+renderAll();
+</script>
+</body>
+</html>
