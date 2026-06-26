@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BKRC — 부경러닝크루</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Barlow+Condensed:wght@700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#0D1B2A; --card:#1A2B3C; --card2:#142030;
@@ -20,9 +20,14 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 
 /* HEADER */
 header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
-.logo-wrap{display:flex;align-items:baseline;gap:10px}
-.logo-bkrc{font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;letter-spacing:4px;color:var(--lime);text-shadow:0 0 18px var(--lime-glow)}
-.logo-sub{font-size:11px;color:var(--muted);letter-spacing:1px}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-icon{width:40px;height:40px;flex-shrink:0}
+.logo-text{display:flex;flex-direction:column;gap:5px;align-items:center}
+.logo-bkrc{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;letter-spacing:3px;color:#fff;line-height:1;position:relative;display:inline-block;text-shadow:0 0 18px rgba(255,255,255,0.35),0 0 40px rgba(255,255,255,0.12)}
+.logo-bkrc::after{content:'';position:absolute;bottom:-3px;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,#C8F000,transparent);border-radius:1px}
+.logo-sub-row{display:flex;align-items:center;justify-content:center;gap:6px}
+.logo-dot{width:4px;height:4px;background:#C8F000;border-radius:50%;flex-shrink:0}
+.logo-sub{font-size:9px;color:var(--muted);letter-spacing:2.5px;font-weight:300}
 .admin-btn{background:none;border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--muted);font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s;font-family:'Noto Sans KR',sans-serif}
 .admin-btn:hover{border-color:var(--border);color:var(--text)}
 
@@ -199,8 +204,13 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 
 <header>
   <div class="logo-wrap">
-    <div class="logo-bkrc">BKRC</div>
-    <div class="logo-sub">부경러닝크루</div>
+    <div class="logo-text">
+      <div class="logo-bkrc">BKRC</div>
+      <div class="logo-sub-row">
+        <div class="logo-dot"></div>
+        <div class="logo-sub">부경러닝크루</div>
+      </div>
+    </div>
   </div>
   <button class="admin-btn" id="adminAccessBtn">⚙ 관리자</button>
 </header>
@@ -237,8 +247,8 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
   <div class="month-tabs" id="rankMonthTabs"></div>
   <!-- Gender Tabs -->
   <div class="rank-gender-tabs">
-    <div class="rank-gender-tab male-tab active" id="tabMale" onclick="setGender('male')">🔵 남자반</div>
-    <div class="rank-gender-tab female-tab" id="tabFemale" onclick="setGender('female')">🩷 여자반</div>
+    <div class="rank-gender-tab male-tab active" id="tabMale" onclick="setGender('male')"><svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:-1px;margin-right:5px"><circle cx="6" cy="6" r="5.5" fill="#4FC3F7"/></svg>남자반</div>
+    <div class="rank-gender-tab female-tab" id="tabFemale" onclick="setGender('female')"><svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:-1px;margin-right:5px"><circle cx="6" cy="6" r="5.5" fill="#F48FB1"/></svg>여자반</div>
   </div>
   <div class="ranking-wrap">
     <div id="rankContent"></div>
@@ -295,7 +305,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       <div class="photo-upload-area" id="photoArea">
         <svg class="photo-upload-icon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
         <div class="photo-upload-label">사진을 탭하여 업로드</div>
-        <input type="file" accept="image/*" id="inputPhoto" capture="environment">
+        <input type="file" accept="image/*" id="inputPhoto">
       </div>
     </div>
     <button class="btn-submit" id="btnSubmit">인증 등록</button>
@@ -307,7 +317,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">🔐 관리자 로그인</div>
-    <div class="admin-login-desc">관리자 비밀번호를 입력하세요.<br><span style="font-size:11px;opacity:.5">기본 비밀번호: bkrc2024</span></div>
+    <div class="admin-login-desc">관리자 비밀번호를 입력하세요.<br><span style="font-size:11px;opacity:.5">기본 비밀번호: bkrc2026</span></div>
     <div class="form-group"><label class="form-label">비밀번호</label><input class="form-input" id="adminPwInput" type="password" placeholder="비밀번호 입력"></div>
     <button class="btn-submit" id="adminLoginBtn">확인</button>
   </div>
@@ -320,7 +330,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 //  DATA
 // ══════════════════════════════════
 const GOAL_KM = 100;
-const ADMIN_PW = 'bkrc2024';
+const ADMIN_PW = 'bkrc2026';
 
 function loadData(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
 function saveData(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -449,7 +459,7 @@ function buildRanked(genderFilter){
 function podiumHTML(ranked, colorClass, barClass, themeClass){
   const medals=['🥇','🥈','🥉'];
   const pcls=['p1','p2','p3'];
-  const order=[1,0,2];
+  const order=[0,1,2];
   const top3=ranked.slice(0,3);
   return order.map(i=>{
     const r=top3[i];
