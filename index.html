@@ -18,6 +18,9 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden}
 
+/* SHARE CARD ANIMATION */
+@keyframes shareCardIn{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
 /* HEADER */
 header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
 .logo-wrap{display:flex;align-items:center;gap:10px}
@@ -796,33 +799,45 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 </div>
 
 <!-- MODAL: 공유 카드 -->
-<div class="modal-bg" id="shareCardBg" style="z-index:320;align-items:center;justify-content:center">
-  <div id="shareCardWrap" style="width:300px;border-radius:20px;overflow:hidden;background:#111e2b;border:1px solid rgba(200,240,0,.12);box-shadow:0 8px 48px rgba(0,0,0,.7);position:relative">
-    <!-- 사진 상단 -->
-    <div id="sharePhotoArea" style="width:100%;height:180px;background:linear-gradient(135deg,#0d1b2a,#1a2b3c);overflow:hidden;position:relative">
-      <img id="sharePhotoImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
-      <div id="sharePhotoPlaceholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-        <svg width="36" height="36" fill="none" stroke="rgba(200,240,0,.2)" stroke-width="1.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+<div class="modal-bg" id="shareCardBg" style="z-index:320;align-items:center;justify-content:center;padding:24px">
+  <!-- 전체 래퍼: 카드 + 버튼 통합 -->
+  <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:0;animation:shareCardIn .32s cubic-bezier(.34,1.56,.64,1)">
+
+    <!-- ── 카드 본체 (저장될 영역) ── -->
+    <div id="shareCardWrap" style="border-radius:20px 20px 0 0;overflow:hidden;background:#111e2b;border:1px solid rgba(200,240,0,.13);border-bottom:none;box-shadow:0 -4px 40px rgba(0,0,0,.5)">
+      <!-- 사진 -->
+      <div id="sharePhotoArea" style="width:100%;height:190px;background:linear-gradient(135deg,#0d1b2a 0%,#1a2b3c 100%);overflow:hidden;position:relative">
+        <img id="sharePhotoImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div id="sharePhotoPlaceholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+          <svg width="32" height="32" fill="none" stroke="rgba(200,240,0,.18)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span style="font-size:9px;color:rgba(200,240,0,.18);letter-spacing:2px">BKRC</span>
+        </div>
+      </div>
+      <!-- 라임 구분선 -->
+      <div style="height:2px;background:linear-gradient(90deg,#C8F000 0%,rgba(200,240,0,.06) 100%)"></div>
+      <!-- 텍스트 영역 -->
+      <div style="padding:16px 20px 18px">
+        <div style="width:22px;height:2px;background:#C8F000;border-radius:2px;margin-bottom:11px"></div>
+        <div id="shareRunDone" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:42px;color:#fff;line-height:1;letter-spacing:-1px">오런완<span style="color:#C8F000">!</span></div>
+        <div id="shareName" style="font-size:11px;color:rgba(255,255,255,.4);font-weight:300;margin-top:4px;letter-spacing:2px"></div>
+        <div id="shareStats" style="display:flex;margin-top:13px;background:rgba(255,255,255,.04);border-radius:9px;overflow:hidden"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding-top:11px;border-top:1px solid rgba(255,255,255,.06)">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:3.5px;color:rgba(255,255,255,.22);font-weight:700">부경러닝크루</div>
+          <div style="font-size:8px;color:rgba(200,240,0,.3);letter-spacing:2.5px;font-weight:700;font-family:'Barlow Condensed',sans-serif">BKRC</div>
+        </div>
       </div>
     </div>
-    <div style="height:3px;background:linear-gradient(90deg,#C8F000,rgba(200,240,0,.08))"></div>
-    <!-- 정보 영역 -->
-    <div style="padding:18px 20px 16px">
-      <div style="width:24px;height:3px;background:#C8F000;border-radius:2px;margin-bottom:12px"></div>
-      <div id="shareRunDone" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:40px;color:#fff;line-height:1;letter-spacing:-1px">오런완<span style="color:#C8F000">!</span></div>
-      <div id="shareName" style="font-size:12px;color:rgba(255,255,255,.45);font-weight:300;margin-top:4px;letter-spacing:1.5px"></div>
-      <div id="shareStats" style="display:flex;margin-top:14px;background:rgba(255,255,255,.04);border-radius:10px;overflow:hidden"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.25);font-weight:700">부경러닝크루</div>
-        <div style="font-size:9px;color:rgba(200,240,0,.35);letter-spacing:2px;font-weight:700;font-family:'Barlow Condensed',sans-serif">BKRC</div>
+
+    <!-- ── 버튼 영역 (카드 하단에 붙어서) ── -->
+    <div style="background:#0f1c2a;border:1px solid rgba(200,240,0,.13);border-top:1px solid rgba(255,255,255,.06);border-radius:0 0 20px 20px;padding:14px 16px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5)">
+      <div style="display:flex;gap:8px">
+        <button id="shareDownloadBtn" style="flex:1;background:linear-gradient(135deg,rgba(200,240,0,.18),rgba(200,240,0,.08));border:1px solid rgba(200,240,0,.35);color:#C8F000;border-radius:11px;padding:11px 8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;letter-spacing:.5px;transition:all .18s">⬇ 저장</button>
+        <button id="shareNativeBtn" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);border-radius:11px;padding:11px 8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .18s">공유 ↗</button>
+        <button id="shareCloseBtn" style="width:44px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);border-radius:11px;font-size:16px;cursor:pointer;transition:all .18s">✕</button>
       </div>
+      <div style="text-align:center;margin-top:10px;font-size:9px;color:rgba(106,127,150,.4);letter-spacing:1px">단톡방에 공유해서 크루원들을 독려해보세요 🏃</div>
     </div>
-  </div>
-  <!-- 버튼 영역 -->
-  <div style="display:flex;gap:10px;margin-top:16px;width:300px">
-    <button id="shareDownloadBtn" style="flex:1;background:rgba(200,240,0,.12);border:1px solid rgba(200,240,0,.3);color:#C8F000;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;letter-spacing:.5px">⬇ 저장</button>
-    <button id="shareNativeBtn" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">공유 ↗</button>
-    <button id="shareCloseBtn" style="width:46px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--muted);border-radius:12px;padding:12px;font-size:14px;cursor:pointer">✕</button>
+
   </div>
 </div>
 
@@ -907,13 +922,35 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       </div>
     </div>
 
+    <div class="manual-divider"></div>
+
+    <!-- 섹션5: 공유 카드 -->
+    <div class="manual-section">
+      <div class="manual-section-title">📤 러닝 공유 카드</div>
+      <div class="manual-item">
+        <div class="manual-item-num">1</div>
+        <div class="manual-item-text">인증 등록이 완료되면 <strong>공유 카드</strong>가 자동으로 팝업돼요.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">2</div>
+        <div class="manual-item-text">인증 사진을 첨부했다면 카드 상단에 사진이 함께 표시됩니다.</div>
+      </div>
+      <div class="manual-item">
+        <div class="manual-item-num">3</div>
+        <div class="manual-item-text"><strong>⬇ 저장</strong>으로 이미지 파일을 기기에 저장하거나, <strong>공유 ↗</strong>로 카카오톡 단톡방에 바로 공유할 수 있어요.</div>
+      </div>
+      <div class="manual-tip-box" style="margin-top:6px">
+        <p>공유 카드는 등록 직후 <strong>1회만</strong> 표시돼요. 크루원들을 독려하고 싶다면 바로 공유해보세요! 🏃</p>
+      </div>
+    </div>
+
     <!-- 개인정보 안내 (최하단 분리) -->
     <div style="margin-top:30px;padding:18px 0 36px;border-top:1px solid rgba(255,255,255,.04)">
       <div style="font-size:9px;letter-spacing:1.5px;color:rgba(106,127,150,.35);text-transform:uppercase;font-weight:700;margin-bottom:8px">개인정보 및 이용 안내</div>
       <div style="font-size:10px;color:rgba(106,127,150,.3);line-height:1.8">
         <p>· 러닝 기록 입력 시 개인정보 수집·이용에 동의한 것으로 간주합니다.</p>
         <p>· 수집된 정보는 BKRC 크루 내부 활동 목적으로만 사용됩니다.</p>
-        <p style="margin-top:8px;font-size:9.5px;color:rgba(106,127,150,.22);line-height:1.75">크루원 개인정보 및 본 앱 URL을 사전 동의 없이 외부에 공유·게시하는 행위는 「개인정보 보호법」에 따라 법적 책임이 따를 수 있습니다.</p>
+        <p style="margin-top:8px;font-size:10px;color:rgba(106,127,150,.3);line-height:1.8">· 크루원 개인정보 및 본 앱 URL을 사전 동의 없이 외부에 공유·게시하는 행위는 「개인정보 보호법」에 따라 법적 책임이 따를 수 있습니다.</p>
       </div>
     </div>
   </div>
@@ -1029,7 +1066,7 @@ function renderFeedPage(){
   document.getElementById('progressLabel').textContent=`${total.toFixed(1)} / ${GOAL_KM} km`;
   document.getElementById('logCount').textContent=cnt+'건';
 
-  const sorted=ml.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const sorted=ml.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)||(b.createdAt||0)-(a.createdAt||0));
   const feed=document.getElementById('feed');
   if(!sorted.length){
     feed.innerHTML=`<div class="empty-state"><svg width="48" height="48" fill="none" stroke="#6A7F96" stroke-width="1.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg><p>이번 달 인증 기록이 없어요.<br>+ 버튼을 눌러 첫 러닝을 인증해 보세요!</p></div>`;
