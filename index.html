@@ -795,6 +795,37 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
   </div>
 </div>
 
+<!-- MODAL: 공유 카드 -->
+<div class="modal-bg" id="shareCardBg" style="z-index:320;align-items:center;justify-content:center">
+  <div id="shareCardWrap" style="width:300px;border-radius:20px;overflow:hidden;background:#111e2b;border:1px solid rgba(200,240,0,.12);box-shadow:0 8px 48px rgba(0,0,0,.7);position:relative">
+    <!-- 사진 상단 -->
+    <div id="sharePhotoArea" style="width:100%;height:180px;background:linear-gradient(135deg,#0d1b2a,#1a2b3c);overflow:hidden;position:relative">
+      <img id="sharePhotoImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
+      <div id="sharePhotoPlaceholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+        <svg width="36" height="36" fill="none" stroke="rgba(200,240,0,.2)" stroke-width="1.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+    </div>
+    <div style="height:3px;background:linear-gradient(90deg,#C8F000,rgba(200,240,0,.08))"></div>
+    <!-- 정보 영역 -->
+    <div style="padding:18px 20px 16px">
+      <div style="width:24px;height:3px;background:#C8F000;border-radius:2px;margin-bottom:12px"></div>
+      <div id="shareRunDone" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:40px;color:#fff;line-height:1;letter-spacing:-1px">오런완<span style="color:#C8F000">!</span></div>
+      <div id="shareName" style="font-size:12px;color:rgba(255,255,255,.45);font-weight:300;margin-top:4px;letter-spacing:1.5px"></div>
+      <div id="shareStats" style="display:flex;margin-top:14px;background:rgba(255,255,255,.04);border-radius:10px;overflow:hidden"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.25);font-weight:700">부경러닝크루</div>
+        <div style="font-size:9px;color:rgba(200,240,0,.35);letter-spacing:2px;font-weight:700;font-family:'Barlow Condensed',sans-serif">BKRC</div>
+      </div>
+    </div>
+  </div>
+  <!-- 버튼 영역 -->
+  <div style="display:flex;gap:10px;margin-top:16px;width:300px">
+    <button id="shareDownloadBtn" style="flex:1;background:rgba(200,240,0,.12);border:1px solid rgba(200,240,0,.3);color:#C8F000;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;letter-spacing:.5px">⬇ 저장</button>
+    <button id="shareNativeBtn" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">공유 ↗</button>
+    <button id="shareCloseBtn" style="width:46px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--muted);border-radius:12px;padding:12px;font-size:14px;cursor:pointer">✕</button>
+  </div>
+</div>
+
 <!-- MODAL: 사용자 매뉴얼 -->
 <div class="manual-modal-bg" id="manualModalBg">
   <div class="manual-modal" style="position:relative">
@@ -1477,12 +1508,88 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
   try{
     const log={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,date,km,pace:pace||null,memo,photo:photoDataUrl||null,pin,createdAt:Date.now()};
     await saveLog(log);
-    feedMonth=getMonthKey(date);clearPhoto();closeRegModal();
+    feedMonth=getMonthKey(date);
+    const savedPhoto=photoDataUrl||null;
+    clearPhoto();closeRegModal();
     document.getElementById('inputPin').value='';
     showToast(`✅ ${name} · ${km}km 인증 완료!`);
+    setTimeout(()=>openShareCard({name,date,km,pace,photo:savedPhoto}),450);
   }finally{
     btn.disabled=false;btn.textContent='인증 등록';
   }
+});
+
+// ══════════════════════════════════
+//  SHARE CARD
+// ══════════════════════════════════
+function openShareCard({name,date,km,pace,photo}){
+  // 사진
+  const img = document.getElementById('sharePhotoImg');
+  const ph  = document.getElementById('sharePhotoPlaceholder');
+  if(photo){ img.src=photo; img.style.display='block'; ph.style.display='none'; }
+  else      { img.style.display='none'; ph.style.display='flex'; }
+
+  // 이름
+  document.getElementById('shareName').textContent = name;
+
+  // 날짜 포맷
+  const d = new Date(date);
+  const dateStr = `${d.getMonth()+1}월 ${d.getDate()}일`;
+
+  // 스탯 칸 구성
+  const stats = document.getElementById('shareStats');
+  const statStyle = 'flex:1;padding:10px;display:flex;flex-direction:column;gap:3px;border-right:1px solid rgba(255,255,255,.06)';
+  const valStyle  = 'font-family:Oswald,sans-serif;font-size:17px;color:#fff;line-height:1';
+  const lblStyle  = 'font-size:8px;color:rgba(255,255,255,.26);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px';
+  let statHTML = `<div style="${statStyle}"><div style="${valStyle}">${parseFloat(km).toFixed(1)}<span style="font-size:10px;color:rgba(255,255,255,.38);margin-left:1px">km</span></div><div style="${lblStyle}">distance</div></div>`;
+  if(pace){
+    statHTML += `<div style="${statStyle}"><div style="${valStyle}">${pace}<span style="font-size:10px;color:rgba(255,255,255,.38);margin-left:1px">/km</span></div><div style="${lblStyle}">pace</div></div>`;
+  }
+  statHTML += `<div style="${statStyle.replace('border-right:1px solid rgba(255,255,255,.06)','')}"><div style="${valStyle};font-size:13px">${dateStr}</div><div style="${lblStyle}">date</div></div>`;
+  stats.innerHTML = statHTML;
+
+  document.getElementById('shareCardBg').classList.add('open');
+}
+
+function closeShareCard(){
+  document.getElementById('shareCardBg').classList.remove('open');
+}
+
+document.getElementById('shareCloseBtn').addEventListener('click', closeShareCard);
+document.getElementById('shareCardBg').addEventListener('click', e=>{
+  if(e.target===document.getElementById('shareCardBg')) closeShareCard();
+});
+
+// 이미지 저장
+document.getElementById('shareDownloadBtn').addEventListener('click', async ()=>{
+  const wrap = document.getElementById('shareCardWrap');
+  try{
+    const {default:html2canvas} = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js');
+    const canvas = await html2canvas(wrap,{backgroundColor:null,scale:2,useCORS:true,logging:false});
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/jpeg',0.92);
+    a.download = 'bkrc_run.jpg';
+    a.click();
+  }catch(e){
+    // 폴백: 공유 API
+    alert('저장 실패. 공유 버튼을 이용해주세요.');
+  }
+});
+
+// 네이티브 공유
+document.getElementById('shareNativeBtn').addEventListener('click', async ()=>{
+  const wrap = document.getElementById('shareCardWrap');
+  try{
+    const {default:html2canvas} = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js');
+    const canvas = await html2canvas(wrap,{backgroundColor:null,scale:2,useCORS:true,logging:false});
+    canvas.toBlob(async blob=>{
+      if(navigator.share && navigator.canShare({files:[new File([blob],'bkrc_run.jpg',{type:'image/jpeg'})]})){
+        await navigator.share({files:[new File([blob],'bkrc_run.jpg',{type:'image/jpeg'})],title:'오런완! 🏃'});
+      } else {
+        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bkrc_run.jpg';a.click();
+      }
+    },'image/jpeg',0.92);
+  }catch(e){ console.error(e); }
 });
 
 // ══════════════════════════════════
