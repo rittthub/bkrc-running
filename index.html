@@ -1387,6 +1387,12 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
 // ══════════════════════════════════
 //  MODAL: 관리자
 // ══════════════════════════════════
+// MANUAL MODAL
+function openManual(){document.getElementById('manualModalBg').classList.add('open')}
+function closeManual(){document.getElementById('manualModalBg').classList.remove('open')}
+document.getElementById('helpBtn').addEventListener('click', openManual);
+document.getElementById('manualModalBg').addEventListener('click', e=>{if(e.target===document.getElementById('manualModalBg'))closeManual()});
+
 document.getElementById('adminAccessBtn').addEventListener('click',()=>{
   if(adminUnlocked){switchToAdmin();return}
   document.getElementById('adminPwInput').value='';
