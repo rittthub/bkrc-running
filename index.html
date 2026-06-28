@@ -944,7 +944,7 @@ function renderFeedPage(){
   document.getElementById('progressLabel').textContent=`${total.toFixed(1)} / ${GOAL_KM} km`;
   document.getElementById('logCount').textContent=cnt+'건';
 
-  const sorted=ml.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const sorted=ml.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)||(b.createdAt||0)-(a.createdAt||0));
   const feed=document.getElementById('feed');
   if(!sorted.length){
     feed.innerHTML=`<div class="empty-state"><svg width="48" height="48" fill="none" stroke="#6A7F96" stroke-width="1.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg><p>이번 달 인증 기록이 없어요.<br>+ 버튼을 눌러 첫 러닝을 인증해 보세요!</p></div>`;
@@ -1662,7 +1662,7 @@ function renderProfilePage(){
   document.getElementById('goalBadgeVal').textContent = profileGoal;
 
   // 타임라인 (이달 기록, 최신순)
-  const sorted = myLogs.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const sorted = myLogs.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)||(b.createdAt||0)-(a.createdAt||0));
   const tlEl = document.getElementById('pTimeline');
   if(!sorted.length){
     tlEl.innerHTML=`<div class="empty-state"><svg width="40" height="40" fill="none" stroke="#6A7F96" stroke-width="1.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg><p>이번 달 기록이 없어요</p></div>`;
