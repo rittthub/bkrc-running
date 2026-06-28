@@ -43,11 +43,11 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 .manual-step-txt b{color:var(--lime);font-weight:700}
 .manual-tip{background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;font-size:12px;color:var(--muted);line-height:1.7;margin-top:4px}
 .manual-divider{height:1px;background:var(--border2);margin:18px 0}
-.manual-legal{background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:12px;padding:14px 15px}
-.manual-legal-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.manual-legal{padding:4px 0 0 0}
+.manual-legal-title{font-size:11px;color:var(--muted);margin-bottom:8px}
 .manual-legal-item{font-size:11px;color:var(--muted);line-height:1.75;padding-left:2px}
-.manual-legal-item+.manual-legal-item{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.05)}
-.manual-legal-highlight{color:var(--muted);font-weight:600}
+.manual-legal-item+.manual-legal-item{margin-top:4px}
+.manual-legal-highlight{color:var(--muted);font-weight:400}
 
 /* NAV */
 .nav-tabs{display:flex;background:rgba(10,18,28,.6);border-bottom:1px solid var(--border2);padding:0 20px}
@@ -790,7 +790,6 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       <div class="manual-step"><div class="manual-step-num">3</div><div class="manual-step-txt"><b>페이스</b>는 선택 입력이에요. 사진을 첨부하면 자동 인식을 시도합니다. 인식 실패 시 직접 입력하세요.</div></div>
       <div class="manual-step"><div class="manual-step-num">4</div><div class="manual-step-txt"><b>삭제 PIN</b> 4자리를 설정하세요. 나중에 내 기록을 직접 삭제할 때 필요해요.</div></div>
       <div class="manual-step"><div class="manual-step-num">5</div><div class="manual-step-txt">인증 사진을 첨부하고 <b>인증 등록</b>을 누르면 완료!</div></div>
-      <div class="manual-tip">💡 인증한 기록은 수정이 불가해요. 잘못 입력했다면 관리자에게 문의하세요.</div>
     </div>
 
     <div class="manual-divider"></div>
@@ -813,19 +812,8 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 
     <div class="manual-divider"></div>
 
-    <div class="manual-section">
-      <div class="manual-section-title">ℹ️ 기타 안내</div>
-      <div class="manual-tip" style="line-height:1.9">
-        · 데이터는 <b style="color:var(--text)">Firebase 서버</b>에 저장되며 크루원 전체가 공유해요.<br>
-        · 기록 삭제는 등록 시 설정한 PIN으로 본인이 직접 할 수 있어요.<br>
-        · PIN을 잊었거나 기록 오류는 <b style="color:var(--text)">관리자에게 문의</b>하세요.
-      </div>
-    </div>
-
-    <div class="manual-divider"></div>
-
     <div class="manual-legal">
-      <div class="manual-legal-title">⚠️ 개인정보 및 이용 안내</div>
+      <div class="manual-legal-title">개인정보 및 이용 안내</div>
       <div class="manual-legal-item">
         · 러닝 기록 입력 시 <span class="manual-legal-highlight">개인정보 수집·이용에 동의</span>한 것으로 봅니다.
       </div>
@@ -840,7 +828,9 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
       </div>
     </div>
 
-    <button class="btn-submit" style="margin-top:20px;background:var(--card);color:var(--text);border:1px solid var(--border2)" onclick="closeManual()">확인</button>
+    <div style="display:flex;justify-content:flex-end;margin-top:20px">
+      <button id="manualCloseBtn" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--card);color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
   </div>
 </div>
 
@@ -1391,6 +1381,7 @@ document.getElementById('btnSubmit').addEventListener('click',async()=>{
 function openManual(){document.getElementById('manualModalBg').classList.add('open')}
 function closeManual(){document.getElementById('manualModalBg').classList.remove('open')}
 document.getElementById('helpBtn').addEventListener('click', openManual);
+document.getElementById('manualCloseBtn').addEventListener('click', closeManual);
 document.getElementById('manualModalBg').addEventListener('click', e=>{if(e.target===document.getElementById('manualModalBg'))closeManual()});
 
 document.getElementById('adminAccessBtn').addEventListener('click',()=>{
