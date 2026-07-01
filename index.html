@@ -479,6 +479,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
 </style>
 </head>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <body>
 
 <header>
@@ -702,7 +703,7 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
           <button class="photo-mgmt-btn" id="btnDownloadStats" style="width:100%;background:var(--card);border:1px solid rgba(200,240,0,.35);color:var(--lime)">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            📊 이달 통계 CSV
+            📊 이달 통계 엑셀 다운로드 (.xlsx)
           </button>
           <div style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:12px 14px">
             <div style="font-size:11px;color:var(--muted);margin-bottom:10px">📋 누계 CSV 다운로드</div>
@@ -1557,41 +1558,26 @@ document.getElementById('btnCollage').addEventListener('click', downloadCollage)
 function downloadStatsCSV(){
   const ml=logs.filter(l=>getMonthKey(l.date)===adminMonth);
   if(!ml.length){showToast('이달 기록이 없습니다');return}
-
-  // Build stats: name, gender, count, total km
   const map={};
   ml.forEach(l=>{
     if(!map[l.name])map[l.name]={cnt:0,km:0,gender:getMemberGender(l.name)};
     map[l.name].cnt+=1;
     map[l.name].km+=parseFloat(l.km||0);
   });
-
-  const sorted=Object.entries(map)
-    .map(([name,v])=>({name,...v}))
-    .sort((a,b)=>b.km-a.km||b.cnt-a.cnt);
-
-  // CSV header
-  let csv='이름,성별,인증횟수,총거리(km)\n';
-  
-  // CSV rows
-  sorted.forEach(s=>{
-    const gender=s.gender==='m'?'남':'여';
-    const line=`${s.name},${gender},${s.cnt},${s.km.toFixed(1)}`;
-    csv+=line+'\n';
-  });
-
-  // Download
-  const bom='\uFEFF'; // UTF-8 BOM for Excel
-  const link=document.createElement('a');
-  link.href='data:text/csv;charset=utf-8,'+encodeURIComponent(bom+csv);
-  link.download=`BKRC_${adminMonth}_통계.csv`;
-  link.click();
+  const sorted=Object.entries(map).map(([name,v])=>({name,...v})).sort((a,b)=>b.km-a.km||b.cnt-a.cnt);
+  const wsData=[['이름','성별','인증횟수','총거리(km)']];
+  sorted.forEach(s=>wsData.push([s.name,s.gender==='m'?'남':'여',s.cnt,parseFloat(s.km.toFixed(1))]));
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:12},{wch:6},{wch:10},{wch:12}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,formatMonthLabel(adminMonth));
+  XLSX.writeFile(wb,`BKRC_${adminMonth}_통계.xlsx`);
   showToast(`📊 ${sorted.length}명 데이터 다운로드 완료`);
 }
 document.getElementById('btnDownloadStats').addEventListener('click', downloadStatsCSV);
 
 function populateCsvMonthSelects(){
-  const months=getAvailableMonths().slice().reverse(); // 오래된순
+  const months=getAvailableMonths().slice().reverse();
   ['csvFromMonth','csvToMonth'].forEach((id,i)=>{
     const sel=document.getElementById(id);
     if(!sel)return;
@@ -1615,15 +1601,13 @@ function downloadAllCSV(){
   const sorted=Object.entries(map).map(([name,v])=>({name,...v})).sort((a,b)=>b.km-a.km);
   const fromLabel=formatMonthLabel(from);
   const toLabel=formatMonthLabel(to);
-  const bom='\uFEFF';
-  let csv=`기간: ${fromLabel} ~ ${toLabel}\n이름,성별,인증횟수,총거리(km)\n`;
-  sorted.forEach(s=>{
-    csv+=`${s.name},${s.gender==='m'?'남':'여'},${s.cnt},${s.km.toFixed(1)}\n`;
-  });
-  const link=document.createElement('a');
-  link.href='data:text/csv;charset=utf-8,'+encodeURIComponent(bom+csv);
-  link.download=`BKRC_누계_${from}_${to}.csv`;
-  link.click();
+  const wsData=[['이름','성별','인증횟수','총거리(km)']];
+  sorted.forEach(s=>wsData.push([s.name,s.gender==='m'?'남':'여',s.cnt,parseFloat(s.km.toFixed(1))]));
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:12},{wch:6},{wch:10},{wch:12}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,`${fromLabel}~${toLabel}`);
+  XLSX.writeFile(wb,`BKRC_누계_${from}_${to}.xlsx`);
   showToast(`📋 ${fromLabel}~${toLabel} 누계 다운로드 완료`);
 }
 document.getElementById('btnDownloadAllCSV').addEventListener('click', downloadAllCSV);
