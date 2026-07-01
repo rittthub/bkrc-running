@@ -699,10 +699,14 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
         <!-- 선택 날짜 기록 -->
         <div id="dayLogsArea"></div>
         <!-- CSV 다운로드 -->
-        <div style="margin-top:16px">
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
           <button class="photo-mgmt-btn" id="btnDownloadStats" style="width:100%;background:var(--card);border:1px solid rgba(200,240,0,.35);color:var(--lime)">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            📊 이달 통계 CSV 다운로드
+            📊 이달 통계 CSV
+          </button>
+          <button class="photo-mgmt-btn" id="btnDownloadAllCSV" style="width:100%;background:var(--card);border:1px solid var(--border2);color:var(--muted)">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            📋 전체 누계 CSV (월별 구분)
           </button>
         </div>
         <div class="admin-logs-table" id="adminLogTable" style="display:none"></div>
@@ -893,7 +897,7 @@ async function removeMember(name){
 //  HELPERS
 // ══════════════════════════════════
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function getMonthKey(d){const dt=new Date(d);return`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`}
+function getMonthKey(d){const[y,m]=d.split('-');return`${y}-${m.padStart(2,'0')}`}
 function formatMonthLabel(k){const[y,m]=k.split('-');return`${y}년 ${parseInt(m)}월`}
 function todayStr(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function thisMonthKey(){return getMonthKey(todayStr())}
@@ -1575,6 +1579,36 @@ function downloadStatsCSV(){
   showToast(`📊 ${sorted.length}명 데이터 다운로드 완료`);
 }
 document.getElementById('btnDownloadStats').addEventListener('click', downloadStatsCSV);
+
+function downloadAllCSV(){
+  if(!logs.length){showToast('기록이 없습니다');return}
+  const months=getAvailableMonths().slice().reverse(); // 오래된 순
+  const bom='\uFEFF';
+  let csv='월,이름,성별,인증횟수,총거리(km)\n';
+  months.forEach(month=>{
+    const ml=logs.filter(l=>getMonthKey(l.date)===month);
+    if(!ml.length)return;
+    const map={};
+    ml.forEach(l=>{
+      if(!map[l.name])map[l.name]={cnt:0,km:0,gender:getMemberGender(l.name)};
+      map[l.name].cnt+=1;
+      map[l.name].km+=parseFloat(l.km||0);
+    });
+    Object.entries(map)
+      .sort((a,b)=>b[1].km-a[1].km)
+      .forEach(([name,v])=>{
+        const g=v.gender==='m'?'남':'여';
+        csv+=`${formatMonthLabel(month)},${name},${g},${v.cnt},${v.km.toFixed(1)}\n`;
+      });
+    csv+='\n'; // 월 구분 빈 줄
+  });
+  const link=document.createElement('a');
+  link.href='data:text/csv;charset=utf-8,'+encodeURIComponent(bom+csv);
+  link.download=`BKRC_전체누계_${thisMonthKey()}.csv`;
+  link.click();
+  showToast('📋 전체 누계 다운로드 완료');
+}
+document.getElementById('btnDownloadAllCSV').addEventListener('click', downloadAllCSV);
 
 // ══════════════════════════════════
 //  PROFILE PAGE
