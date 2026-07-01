@@ -704,10 +704,15 @@ header{background:rgba(10,18,28,.95);border-bottom:1px solid var(--border);paddi
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             📊 이달 통계 CSV
           </button>
-          <button class="photo-mgmt-btn" id="btnDownloadAllCSV" style="width:100%;background:var(--card);border:1px solid var(--border2);color:var(--muted)">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            📋 전체 누계 CSV (월별 구분)
-          </button>
+          <div style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:12px 14px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">📋 누계 CSV 다운로드</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <select id="csvFromMonth" style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:7px 8px;color:var(--text);font-size:12px;font-family:'Noto Sans KR',sans-serif;outline:none"></select>
+              <span style="color:var(--muted);font-size:13px;flex-shrink:0">~</span>
+              <select id="csvToMonth" style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:7px 8px;color:var(--text);font-size:12px;font-family:'Noto Sans KR',sans-serif;outline:none"></select>
+              <button id="btnDownloadAllCSV" style="flex-shrink:0;background:rgba(200,240,0,.1);border:1px solid rgba(200,240,0,.3);border-radius:8px;padding:7px 12px;color:var(--lime);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">다운로드</button>
+            </div>
+          </div>
         </div>
         <div class="admin-logs-table" id="adminLogTable" style="display:none"></div>
       </div>
@@ -928,9 +933,13 @@ let currentPage = 'feed';
 function renderMonthTabs(id, active, cb){
   const months=getAvailableMonths();
   if(!months.includes(active))active=months[0];
-  document.getElementById(id).innerHTML=months.map(m=>
-    `<button class="month-tab ${m===active?'active':''}" onclick="(${cb.toString()})('${m}')">${formatMonthLabel(m)}</button>`
+  const el=document.getElementById(id);
+  el.innerHTML=months.map(m=>
+    `<button class="month-tab ${m===active?'active':''}" data-month="${m}">${formatMonthLabel(m)}</button>`
   ).join('');
+  el.querySelectorAll('.month-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>cb(btn.dataset.month));
+  });
   return active;
 }
 
@@ -1124,6 +1133,7 @@ function renderAdminPhotos(){
 /* ③ 기록관리 - 달력 */
 function renderAdminRecords(){
   adminMonth=renderMonthTabs('adminMonthTabs2',adminMonth,m=>{adminMonth=m;selectedCalDay=null;renderAdminRecords()});
+  populateCsvMonthSelects();
   renderRecordCalendar();
   renderDayLogs();
 }
@@ -1580,33 +1590,41 @@ function downloadStatsCSV(){
 }
 document.getElementById('btnDownloadStats').addEventListener('click', downloadStatsCSV);
 
+function populateCsvMonthSelects(){
+  const months=getAvailableMonths().slice().reverse(); // 오래된순
+  ['csvFromMonth','csvToMonth'].forEach((id,i)=>{
+    const sel=document.getElementById(id);
+    if(!sel)return;
+    sel.innerHTML=months.map(m=>`<option value="${m}">${formatMonthLabel(m)}</option>`).join('');
+    sel.value=i===0?months[0]:months[months.length-1];
+  });
+}
+
 function downloadAllCSV(){
-  if(!logs.length){showToast('기록이 없습니다');return}
-  const months=getAvailableMonths().slice().reverse(); // 오래된 순
+  const from=document.getElementById('csvFromMonth').value;
+  const to=document.getElementById('csvToMonth').value;
+  if(from>to){showToast('시작월이 종료월보다 늦습니다');return}
+  const ml=logs.filter(l=>{const mk=getMonthKey(l.date);return mk>=from&&mk<=to;});
+  if(!ml.length){showToast('해당 기간 기록이 없습니다');return}
+  const map={};
+  ml.forEach(l=>{
+    if(!map[l.name])map[l.name]={cnt:0,km:0,gender:getMemberGender(l.name)};
+    map[l.name].cnt+=1;
+    map[l.name].km+=parseFloat(l.km||0);
+  });
+  const sorted=Object.entries(map).map(([name,v])=>({name,...v})).sort((a,b)=>b.km-a.km);
+  const fromLabel=formatMonthLabel(from);
+  const toLabel=formatMonthLabel(to);
   const bom='\uFEFF';
-  let csv='월,이름,성별,인증횟수,총거리(km)\n';
-  months.forEach(month=>{
-    const ml=logs.filter(l=>getMonthKey(l.date)===month);
-    if(!ml.length)return;
-    const map={};
-    ml.forEach(l=>{
-      if(!map[l.name])map[l.name]={cnt:0,km:0,gender:getMemberGender(l.name)};
-      map[l.name].cnt+=1;
-      map[l.name].km+=parseFloat(l.km||0);
-    });
-    Object.entries(map)
-      .sort((a,b)=>b[1].km-a[1].km)
-      .forEach(([name,v])=>{
-        const g=v.gender==='m'?'남':'여';
-        csv+=`${formatMonthLabel(month)},${name},${g},${v.cnt},${v.km.toFixed(1)}\n`;
-      });
-    csv+='\n'; // 월 구분 빈 줄
+  let csv=`기간: ${fromLabel} ~ ${toLabel}\n이름,성별,인증횟수,총거리(km)\n`;
+  sorted.forEach(s=>{
+    csv+=`${s.name},${s.gender==='m'?'남':'여'},${s.cnt},${s.km.toFixed(1)}\n`;
   });
   const link=document.createElement('a');
   link.href='data:text/csv;charset=utf-8,'+encodeURIComponent(bom+csv);
-  link.download=`BKRC_전체누계_${thisMonthKey()}.csv`;
+  link.download=`BKRC_누계_${from}_${to}.csv`;
   link.click();
-  showToast('📋 전체 누계 다운로드 완료');
+  showToast(`📋 ${fromLabel}~${toLabel} 누계 다운로드 완료`);
 }
 document.getElementById('btnDownloadAllCSV').addEventListener('click', downloadAllCSV);
 
